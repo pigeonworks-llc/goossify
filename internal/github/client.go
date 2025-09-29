@@ -26,22 +26,22 @@ type Config struct {
 
 // RepositorySettings はリポジトリ設定
 type RepositorySettings struct {
-	BranchProtection   BranchProtectionSettings
-	Labels            []LabelConfig
-	RequiredReviews   int
-	StatusChecks      []string
-	AutoMerge         bool
+	BranchProtection    BranchProtectionSettings
+	Labels              []LabelConfig
+	RequiredReviews     int
+	StatusChecks        []string
+	AutoMerge           bool
 	DeleteBranchOnMerge bool
 }
 
 // BranchProtectionSettings はブランチ保護設定
 type BranchProtectionSettings struct {
-	Branch                 string
-	RequiredStatusChecks   []string
-	RequiredReviews        int
-	DismissStaleReviews    bool
+	Branch                  string
+	RequiredStatusChecks    []string
+	RequiredReviews         int
+	DismissStaleReviews     bool
 	RequireCodeOwnerReviews bool
-	RestrictPushes         bool
+	RestrictPushes          bool
 }
 
 // LabelConfig はラベル設定

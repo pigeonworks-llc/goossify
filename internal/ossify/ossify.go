@@ -237,23 +237,23 @@ We love your input! We want to make contributing to this project as easy and tra
 
 ### Setup
 
-` + "```bash" + `
+`+"```bash"+`
 git clone https://github.com/pigeonworks-llc/%s.git
 cd %s
 go mod download
-` + "```" + `
+`+"```"+`
 
 ### Running Tests
 
-` + "```bash" + `
+`+"```bash"+`
 go test ./...
-` + "```" + `
+`+"```"+`
 
 ### Running the Application
 
-` + "```bash" + `
+`+"```bash"+`
 go run main.go
-` + "```" + `
+`+"```"+`
 
 ## Pull Request Process
 

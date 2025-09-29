@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/pigeonworks-llc/goossify/internal/github"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -77,8 +77,8 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 			RequireCodeOwnerReviews: false,
 			RestrictPushes:          false,
 		},
-		Labels:                 github.GetDefaultLabels(),
-		DeleteBranchOnMerge:    true,
+		Labels:              github.GetDefaultLabels(),
+		DeleteBranchOnMerge: true,
 	}
 
 	if err := client.SetupRepository(settings); err != nil {
