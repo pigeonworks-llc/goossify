@@ -105,7 +105,7 @@ linters:
     - wastedassign
     - testpackage
     - usetesting
-    - importas
+    - imports
     - lll
 
   disable:

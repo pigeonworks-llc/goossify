@@ -97,7 +97,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`, time.Now().Year())
 
-	return os.WriteFile(licensePath, []byte(licenseContent), 0644)
+	return os.WriteFile(licensePath, []byte(licenseContent), 0600)
 }
 
 func (o *Ossifier) ensureGitHubFiles() error {
@@ -160,7 +160,7 @@ jobs:
       with:
         version: latest`
 
-		if err := os.WriteFile(ciPath, []byte(ciContent), 0644); err != nil {
+		if err := os.WriteFile(ciPath, []byte(ciContent), 0600); err != nil {
 			return fmt.Errorf("CI設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -202,7 +202,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_OWNER: ${{ github.repository_owner }}`
 
-		if err := os.WriteFile(releasePath, []byte(releaseContent), 0644); err != nil {
+		if err := os.WriteFile(releasePath, []byte(releaseContent), 0600); err != nil {
 			return fmt.Errorf("Release workflow作成失敗: %w", err)
 		}
 	}

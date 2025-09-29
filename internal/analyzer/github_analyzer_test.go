@@ -79,8 +79,6 @@ func TestGitHubAnalyzer(t *testing.T) {
 			mock.SetRepository(tt.repository)
 			mock.SetBranchProtection(tt.protection, tt.protectionErr)
 
-			// 実際のテストロジックをここに実装
-			// 現在は基本的な構造のテストのみ
 			if tt.repository.GetDefaultBranch() != tt.expectedBranch {
 				t.Errorf("expected branch %s, got %s", tt.expectedBranch, tt.repository.GetDefaultBranch())
 			}

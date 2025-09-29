@@ -78,7 +78,7 @@ func NewClient(config Config) (*Client, error) {
 }
 
 // SetupRepository はリポジトリの基本設定を行う
-func (c *Client) SetupRepository(settings RepositorySettings) error {
+func (c *Client) SetupRepository(settings *RepositorySettings) error {
 	// 1. ラベル設定
 	if err := c.setupLabels(settings.Labels); err != nil {
 		return fmt.Errorf("ラベル設定失敗: %w", err)
@@ -90,7 +90,7 @@ func (c *Client) SetupRepository(settings RepositorySettings) error {
 	}
 
 	// 3. リポジトリ一般設定
-	if err := c.updateRepositorySettings(settings); err != nil {
+	if err := c.updateRepositorySettings(*settings); err != nil {
 		return fmt.Errorf("リポジトリ設定失敗: %w", err)
 	}
 
@@ -111,7 +111,8 @@ func (c *Client) setupLabels(labels []LabelConfig) error {
 	}
 
 	// ラベル作成・更新
-	for _, labelConfig := range labels {
+	for i := range labels {
+		labelConfig := labels[i]
 		label := &github.Label{
 			Name:        &labelConfig.Name,
 			Color:       &labelConfig.Color,

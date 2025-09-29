@@ -271,7 +271,7 @@ func (a *ProjectAnalyzer) checkFile(fileName, description string, required bool)
 }
 
 // checkDirectory はディレクトリの存在をチェック
-func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required bool) Item {
+func (a *ProjectAnalyzer) checkDirectory(dirName, description string, _ bool) Item {
 	path := filepath.Join(a.projectPath, dirName)
 	stat, err := os.Stat(path)
 
@@ -283,7 +283,7 @@ func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required b
 	return Item{
 		Name:        dirName + "/",
 		Status:      status,
-		Required:    required,
+		Required:    false,
 		Description: description,
 		Path:        path,
 	}
@@ -292,7 +292,7 @@ func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required b
 // checkTestFiles はテストファイルの存在をチェック
 func (a *ProjectAnalyzer) checkTestFiles(description string, required bool) Item {
 	testFiles := 0
-	filepath.Walk(a.projectPath, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(a.projectPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -426,7 +426,7 @@ func (a *ProjectAnalyzer) extractMissingItems(categories []CategoryResult) []Mis
 					Category:    category.Name,
 					Priority:    priority,
 					Description: item.Description,
-					Action:      fmt.Sprintf("goossify ossify でファイルを生成できます"),
+					Action:      "goossify ossify でファイルを生成できます",
 				})
 			}
 		}

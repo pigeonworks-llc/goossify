@@ -81,7 +81,7 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 		DeleteBranchOnMerge:    true,
 	}
 
-	if err := client.SetupRepository(settings); err != nil {
+	if err := client.SetupRepository(&settings); err != nil {
 		return fmt.Errorf("リポジトリ設定失敗: %w", err)
 	}
 
