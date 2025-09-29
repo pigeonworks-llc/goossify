@@ -33,12 +33,12 @@ Note: This command does not perform actual publication. It only executes checks.
 func init() {
 	rootCmd.AddCommand(readyCmd)
 
-	readyCmd.Flags().BoolVar(&readyDryRun, "dry-run", true, "詳細チェック実行（常にチェックのみ）")
+	readyCmd.Flags().BoolVar(&readyDryRun, "dry-run", true, "Detailed check execution (always check-only)")
 	readyCmd.Flags().StringVar(&readyToken, "github-token", "", "GitHub Personal Access Token")
 }
 
 func runReady(cmd *cobra.Command, args []string) error {
-	// 分析対象パスの決定
+	// Determine target path for analysis
 	var targetPath string
 	if len(args) == 0 {
 		targetPath = "."
@@ -102,7 +102,7 @@ func runReady(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// checkSensitiveFiles は機密情報を含むファイルをチェック
+// checkSensitiveFiles checks for files containing sensitive information
 func checkSensitiveFiles(projectPath string) error {
 	sensitivePatterns := []string{
 		".env",
@@ -113,10 +113,10 @@ func checkSensitiveFiles(projectPath string) error {
 		"credentials.json",
 	}
 
-	fmt.Printf("  チェックパターン: %v\n", sensitivePatterns)
+	fmt.Printf("  Check patterns: %v\n", sensitivePatterns)
 
-	// TODO: 実際のファイルスキャン実装
-	// 現在は基本チェックのみ
+	// TODO: Implement actual file scanning
+	// Currently only basic check
 
 	return nil
 }

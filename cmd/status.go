@@ -46,7 +46,7 @@ func init() {
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
-	// 分析対象パスの決定
+	// Determine target path for analysis
 	var targetPath string
 	if len(args) == 0 {
 		targetPath = "."

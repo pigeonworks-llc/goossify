@@ -33,24 +33,24 @@ var (
 // initCmd represents the init command.
 var initCmd = &cobra.Command{
 	Use:   "init [project-name]",
-	Short: "新しいGo OSSプロジェクトを初期化",
-	Long: `新しいGo言語のOSSプロジェクトを完全自動化で初期化します。
+	Short: "Initialize a new Go OSS project",
+	Long: `Initialize a new Go OSS project with full automation.
 
-このコマンドは以下を自動生成します：
-🏗️  最適化されたディレクトリ構造
-📄  必須ファイル群 (README, LICENSE, .gitignore等)
-🔧  開発ツール設定 (golangci-lint, GoReleaser等)
-🤖  CI/CD パイプライン (GitHub Actions)
-📊  品質管理ツール統合
-👥  コミュニティファイル
+This command automatically generates:
+🏗️  Optimized directory structure
+📄  Essential files (README, LICENSE, .gitignore, etc.)
+🔧  Development tool configuration (golangci-lint, GoReleaser, etc.)
+🤖  CI/CD pipeline (GitHub Actions)
+📊  Quality management tool integration
+👥  Community files
 
-利用可能なプロジェクトタイプ：
-• cli-tool  - CLIアプリケーション (Cobra使用)
-• library   - Go言語ライブラリ・パッケージ
-• web-api   - REST API / GraphQL サーバー
-• service   - マイクロサービス・デーモン
+Available project types:
+• cli-tool  - CLI application (using Cobra)
+• library   - Go library/package
+• web-api   - REST API / GraphQL server
+• service   - Microservice/daemon
 
-使用例:
+Examples:
   goossify init my-awesome-project
   goossify init --type cli-tool my-cli-app
   goossify init --interactive my-project`,
@@ -61,13 +61,13 @@ var initCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "対話的モードで設定")
-	initCmd.Flags().StringVarP(&projectType, "type", "t", "", "プロジェクトタイプ (cli-tool|library|web-api|service)")
-	initCmd.Flags().StringVar(&templateName, "template", "", "使用するテンプレート名")
-	initCmd.Flags().StringVarP(&author, "author", "a", "", "作成者名")
-	initCmd.Flags().StringVarP(&email, "email", "e", "", "作成者メールアドレス")
-	initCmd.Flags().StringVarP(&license, "license", "l", "MIT", "ライセンス")
-	initCmd.Flags().StringVarP(&githubUsername, "github", "g", "", "GitHubユーザー名")
+	initCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "Configure in interactive mode")
+	initCmd.Flags().StringVarP(&projectType, "type", "t", "", "Project type (cli-tool|library|web-api|service)")
+	initCmd.Flags().StringVar(&templateName, "template", "", "Template name to use")
+	initCmd.Flags().StringVarP(&author, "author", "a", "", "Author name")
+	initCmd.Flags().StringVarP(&email, "email", "e", "", "Author email address")
+	initCmd.Flags().StringVarP(&license, "license", "l", "MIT", "License type")
+	initCmd.Flags().StringVarP(&githubUsername, "github", "g", "", "GitHub username")
 }
 
 func runInit(cmd *cobra.Command, args []string) error {
@@ -76,34 +76,34 @@ func runInit(cmd *cobra.Command, args []string) error {
 		projectName = args[0]
 	}
 
-	// プロジェクト設定を収集
+	// Collect project configuration
 	config, err := collectProjectConfig(projectName)
 	if err != nil {
-		return fmt.Errorf("プロジェクト設定の収集に失敗: %w", err)
+		return fmt.Errorf("failed to collect project configuration: %w", err)
 	}
 
-	// プロジェクトディレクトリ作成
+	// Create project directory
 	projectPath, err := createProjectDirectory(config.Name)
 	if err != nil {
-		return fmt.Errorf("プロジェクトディレクトリ作成に失敗: %w", err)
+		return fmt.Errorf("failed to create project directory: %w", err)
 	}
 
-	// プロジェクト生成
+	// Generate project
 	gen := generator.New(projectPath, config)
 	if err := gen.Generate(); err != nil {
-		return fmt.Errorf("プロジェクト生成に失敗: %w", err)
+		return fmt.Errorf("failed to generate project: %w", err)
 	}
 
-	fmt.Printf("🎉 Go OSSプロジェクト '%s' が正常に作成されました！\n\n", config.Name)
-	fmt.Println("次の手順:")
+	fmt.Printf("🎉 Successfully created Go OSS project '%s'!\n\n", config.Name)
+	fmt.Println("Next steps:")
 	fmt.Printf("  cd %s\n", config.Name)
 	fmt.Println("  go mod tidy")
 	fmt.Println("  git init")
 	fmt.Println("  git add .")
 	fmt.Println("  git commit -m \"🎉 Initial commit\"")
 	fmt.Println()
-	fmt.Println("プロジェクト管理:")
-	fmt.Println("  goossify status     # プロジェクト健全性確認")
+	fmt.Println("Project management:")
+	fmt.Println("  goossify status     # Check project health")
 
 	return nil
 }
@@ -124,9 +124,9 @@ func collectProjectConfig(projectName string) (*generator.ProjectConfig, error) 
 		}
 	}
 
-	// デフォルト値の設定
+	// Set default values
 	if config.Name == "" {
-		return nil, fmt.Errorf("プロジェクト名は必須です")
+		return nil, fmt.Errorf("project name is required")
 	}
 
 	if config.Type == "" {
@@ -141,7 +141,7 @@ func collectProjectConfig(projectName string) (*generator.ProjectConfig, error) 
 		config.GitHubUsername = "your-username"
 	}
 
-	// 説明の自動生成
+	// Auto-generate description
 	if config.Description == "" {
 		config.Description = generateDescription(config.Type, config.Name)
 	}
@@ -179,7 +179,7 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 
 func promptProjectName(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Name == "" {
-		fmt.Print("プロジェクト名: ")
+		fmt.Print("Project name: ")
 		name, err := reader.ReadString('\n')
 		if err != nil {
 			return err
@@ -191,12 +191,12 @@ func promptProjectName(reader *bufio.Reader, config *generator.ProjectConfig) er
 
 func promptProjectType(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Type == "" {
-		fmt.Println("\nプロジェクトタイプを選択してください:")
-		fmt.Println("  1. cli-tool  - CLIアプリケーション")
-		fmt.Println("  2. library   - Go言語ライブラリ")
-		fmt.Println("  3. web-api   - REST API / GraphQL サーバー")
-		fmt.Println("  4. service   - マイクロサービス・デーモン")
-		fmt.Print("選択 [1-4] (1): ")
+		fmt.Println("\nSelect project type:")
+		fmt.Println("  1. cli-tool  - CLI application")
+		fmt.Println("  2. library   - Go library")
+		fmt.Println("  3. web-api   - REST API / GraphQL server")
+		fmt.Println("  4. service   - Microservice/daemon")
+		fmt.Print("Choice [1-4] (1): ")
 
 		choice, err := reader.ReadString('\n')
 		if err != nil {
@@ -220,7 +220,7 @@ func promptProjectType(reader *bufio.Reader, config *generator.ProjectConfig) er
 }
 
 func promptDescription(reader *bufio.Reader, config *generator.ProjectConfig) error {
-	fmt.Print("プロジェクトの説明: ")
+	fmt.Print("Project description: ")
 	desc, err := reader.ReadString('\n')
 	if err != nil {
 		return err
@@ -231,7 +231,7 @@ func promptDescription(reader *bufio.Reader, config *generator.ProjectConfig) er
 
 func promptAuthor(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Author == "" {
-		fmt.Print("作成者名: ")
+		fmt.Print("Author name: ")
 		authorName, err := reader.ReadString('\n')
 		if err != nil {
 			return err
@@ -243,7 +243,7 @@ func promptAuthor(reader *bufio.Reader, config *generator.ProjectConfig) error {
 
 func promptEmail(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Email == "" {
-		fmt.Print("メールアドレス: ")
+		fmt.Print("Email address: ")
 		emailAddr, err := reader.ReadString('\n')
 		if err != nil {
 			return err
@@ -255,7 +255,7 @@ func promptEmail(reader *bufio.Reader, config *generator.ProjectConfig) error {
 
 func promptGitHubUsername(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.GitHubUsername == "" {
-		fmt.Print("GitHubユーザー名: ")
+		fmt.Print("GitHub username: ")
 		username, err := reader.ReadString('\n')
 		if err != nil {
 			return err
@@ -267,7 +267,7 @@ func promptGitHubUsername(reader *bufio.Reader, config *generator.ProjectConfig)
 
 func promptLicense(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.License == "" {
-		fmt.Print("ライセンス (MIT): ")
+		fmt.Print("License (MIT): ")
 		licenseType, err := reader.ReadString('\n')
 		if err != nil {
 			return err
@@ -298,27 +298,27 @@ func generateDescription(projectType, projectName string) string {
 
 func createProjectDirectory(projectName string) (string, error) {
 	if projectName == "" {
-		return "", fmt.Errorf("プロジェクト名は必須です")
+		return "", fmt.Errorf("project name is required")
 	}
 
 	wd, err := os.Getwd()
 	if err != nil {
-		return "", fmt.Errorf("作業ディレクトリ取得失敗: %w", err)
+		return "", fmt.Errorf("failed to get working directory: %w", err)
 	}
 
 	projectPath := filepath.Join(wd, projectName)
 
 	if info, err := os.Stat(projectPath); err == nil {
 		if info.IsDir() {
-			return "", fmt.Errorf("ディレクトリ '%s' は既に存在します", projectPath)
+			return "", fmt.Errorf("directory '%s' already exists", projectPath)
 		}
-		return "", fmt.Errorf("'%s' は既存のファイルです", projectPath)
+		return "", fmt.Errorf("'%s' is an existing file", projectPath)
 	} else if !errors.Is(err, os.ErrNotExist) {
-		return "", fmt.Errorf("ディレクトリ確認失敗: %w", err)
+		return "", fmt.Errorf("failed to check directory: %w", err)
 	}
 
 	if err := os.MkdirAll(projectPath, 0o755); err != nil {
-		return "", fmt.Errorf("ディレクトリ作成失敗: %w", err)
+		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	return projectPath, nil
