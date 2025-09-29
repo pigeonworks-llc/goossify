@@ -1,0 +1,23 @@
+package main
+
+import (
+	"fmt"
+	"github.com/pigeonworks-llc/goossify/internal/analyzer"
+)
+
+func main() {
+	fmt.Println("Testing GitHub analyzer...")
+
+	// Test creating the analyzer
+	githubAnalyzer, err := analyzer.NewGitHubAnalyzer("dummy_token")
+	if err != nil {
+		fmt.Printf("Error creating analyzer: %v\n", err)
+		return
+	}
+
+	fmt.Printf("GitHub analyzer created: %v\n", githubAnalyzer)
+
+	// Test GitHubCheck type
+	var check *analyzer.GitHubCheck
+	fmt.Printf("GitHubCheck type: %T\n", check)
+}

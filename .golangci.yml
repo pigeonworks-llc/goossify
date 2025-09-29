@@ -1,0 +1,78 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck      # checking for unchecked errors
+    - gosimple      # simplify code
+    - govet         # reports suspicious constructs
+    - ineffassign   # detects unused assignments
+    - staticcheck   # go vet on steroids
+    - typecheck     # type-checks Go code
+    - unused        # checks for unused constants, variables, functions and types
+    - goimports     # fix imports and format code
+    - misspell      # finds misspelled English words in comments
+    - gocritic      # provides diagnostics that check for bugs, performance and style issues
+    - revive        # fast, configurable, extensible, flexible replacement for golint
+    - gosec         # inspects source code for security problems
+    - unconvert     # remove unnecessary type conversions
+    - unparam       # reports unused function parameters
+    - gocyclo       # computes cyclomatic complexities
+    - gofmt         # checks whether code was gofmt-ed
+    - whitespace    # tool for detection of leading and trailing whitespace
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+      - wrapperFunc
+
+  revive:
+    rules:
+      - name: exported
+        arguments: [checkPrivateReceivers]
+
+  gosec:
+    excludes:
+      - G204 # subprocess launched with variable
+      - G304 # file path provided as tainted input
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - gosec
+        - errcheck
+        - revive
+
+    # Exclude known linters from partially hard-to-fix issues
+    - path: internal/.*
+      text: "unexported-return"
+      linters:
+        - revive
+
+    # Exclude shadow checking on err variables in some cases
+    - text: "shadow: declaration of \"err\""
+      linters:
+        - govet
+
+  max-issues-per-linter: 50
+  max-same-issues: 3
