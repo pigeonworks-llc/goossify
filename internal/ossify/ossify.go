@@ -422,7 +422,7 @@ A clear and concise description of any alternative solutions or features you've 
 **Additional context**
 Add any other context or screenshots about the feature request here.`
 
-		if err := os.WriteFile(featureReqPath, []byte(featureReqContent), 0644); err != nil {
+		if err := os.WriteFile(featureReqPath, []byte(featureReqContent), 0600); err != nil {
 			return fmt.Errorf("Feature request テンプレート作成失敗: %w", err)
 		}
 	}
@@ -464,7 +464,7 @@ Add screenshots to help explain your changes.
 ## Additional Notes
 Any additional information, configuration, or data that might be helpful in reviewing this PR.`
 
-		if err := os.WriteFile(prTemplatePath, []byte(prTemplateContent), 0644); err != nil {
+		if err := os.WriteFile(prTemplatePath, []byte(prTemplateContent), 0600); err != nil {
 			return fmt.Errorf("PR テンプレート作成失敗: %w", err)
 		}
 	}
@@ -484,7 +484,7 @@ func (o *Ossifier) ensureDirectories() error {
 		// .gitkeepファイルを作成してディレクトリを保持
 		gitkeepPath := filepath.Join(docsDir, ".gitkeep")
 		gitkeepContent := "# このファイルはdocsディレクトリを保持するためのものです\n# ドキュメントファイルを追加したら削除してください\n"
-		if err := os.WriteFile(gitkeepPath, []byte(gitkeepContent), 0644); err != nil {
+		if err := os.WriteFile(gitkeepPath, []byte(gitkeepContent), 0600); err != nil {
 			return fmt.Errorf(".gitkeep作成失敗: %w", err)
 		}
 	}
@@ -543,7 +543,7 @@ func (o *Ossifier) ensureConfigFiles() error {
   "rebaseWhen": "conflicted"
 }`
 
-		if err := os.WriteFile(renovatePath, []byte(renovateContent), 0644); err != nil {
+		if err := os.WriteFile(renovatePath, []byte(renovateContent), 0600); err != nil {
 			return fmt.Errorf("Renovate設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -620,7 +620,7 @@ changelog:
     - title: Others
       order: 999`
 
-		if err := os.WriteFile(goreleaserPath, []byte(goreleaserContent), 0644); err != nil {
+		if err := os.WriteFile(goreleaserPath, []byte(goreleaserContent), 0600); err != nil {
 			return fmt.Errorf("GoReleaser設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -708,7 +708,7 @@ issues:
   max-issues-per-linter: 50
   max-same-issues: 3`
 
-		if err := os.WriteFile(golangciPath, []byte(golangciContent), 0644); err != nil {
+		if err := os.WriteFile(golangciPath, []byte(golangciContent), 0600); err != nil {
 			return fmt.Errorf("golangci-lint設定ファイル作成失敗: %w", err)
 		}
 	}
