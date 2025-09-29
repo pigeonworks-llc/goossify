@@ -6,14 +6,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/pigeonworks-llc/goossify/internal/analyzer"
+	"github.com/spf13/cobra"
 )
 
 var (
-	statusFormat    string
-	statusFix       bool
-	statusGitHub    bool
+	statusFormat      string
+	statusFix         bool
+	statusGitHub      bool
 	statusGitHubToken string
 )
 

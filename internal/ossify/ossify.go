@@ -97,7 +97,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`, time.Now().Year())
 
-	return os.WriteFile(licensePath, []byte(licenseContent), 0644)
+	return os.WriteFile(licensePath, []byte(licenseContent), 0600)
 }
 
 func (o *Ossifier) ensureGitHubFiles() error {
@@ -160,7 +160,7 @@ jobs:
       with:
         version: latest`
 
-		if err := os.WriteFile(ciPath, []byte(ciContent), 0644); err != nil {
+		if err := os.WriteFile(ciPath, []byte(ciContent), 0600); err != nil {
 			return fmt.Errorf("CI設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -202,7 +202,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_OWNER: ${{ github.repository_owner }}`
 
-		if err := os.WriteFile(releasePath, []byte(releaseContent), 0644); err != nil {
+		if err := os.WriteFile(releasePath, []byte(releaseContent), 0600); err != nil {
 			return fmt.Errorf("Release workflow作成失敗: %w", err)
 		}
 	}
@@ -237,23 +237,23 @@ We love your input! We want to make contributing to this project as easy and tra
 
 ### Setup
 
-` + "```bash" + `
+`+"```bash"+`
 git clone https://github.com/pigeonworks-llc/%s.git
 cd %s
 go mod download
-` + "```" + `
+`+"```"+`
 
 ### Running Tests
 
-` + "```bash" + `
+`+"```bash"+`
 go test ./...
-` + "```" + `
+`+"```"+`
 
 ### Running the Application
 
-` + "```bash" + `
+`+"```bash"+`
 go run main.go
-` + "```" + `
+`+"```"+`
 
 ## Pull Request Process
 
@@ -269,7 +269,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 By contributing, you agree that your contributions will be licensed under the MIT License.`, o.projectName, o.projectName, o.projectName)
 
-		if err := os.WriteFile(contributingPath, []byte(contributingContent), 0644); err != nil {
+		if err := os.WriteFile(contributingPath, []byte(contributingContent), 0600); err != nil {
 			return fmt.Errorf("CONTRIBUTING.md作成失敗: %w", err)
 		}
 	}
@@ -313,7 +313,7 @@ This information will help us triage your report more quickly.
 
 We prefer all communications to be in English or Japanese.`, o.projectName)
 
-		if err := os.WriteFile(securityPath, []byte(securityContent), 0644); err != nil {
+		if err := os.WriteFile(securityPath, []byte(securityContent), 0600); err != nil {
 			return fmt.Errorf("SECURITY.md作成失敗: %w", err)
 		}
 	}
@@ -393,7 +393,7 @@ If applicable, add screenshots to help explain your problem.
 **Additional context**
 Add any other context about the problem here.`
 
-		if err := os.WriteFile(bugReportPath, []byte(bugReportContent), 0644); err != nil {
+		if err := os.WriteFile(bugReportPath, []byte(bugReportContent), 0600); err != nil {
 			return fmt.Errorf("Bug report テンプレート作成失敗: %w", err)
 		}
 	}
@@ -422,7 +422,7 @@ A clear and concise description of any alternative solutions or features you've 
 **Additional context**
 Add any other context or screenshots about the feature request here.`
 
-		if err := os.WriteFile(featureReqPath, []byte(featureReqContent), 0644); err != nil {
+		if err := os.WriteFile(featureReqPath, []byte(featureReqContent), 0600); err != nil {
 			return fmt.Errorf("Feature request テンプレート作成失敗: %w", err)
 		}
 	}
@@ -464,7 +464,7 @@ Add screenshots to help explain your changes.
 ## Additional Notes
 Any additional information, configuration, or data that might be helpful in reviewing this PR.`
 
-		if err := os.WriteFile(prTemplatePath, []byte(prTemplateContent), 0644); err != nil {
+		if err := os.WriteFile(prTemplatePath, []byte(prTemplateContent), 0600); err != nil {
 			return fmt.Errorf("PR テンプレート作成失敗: %w", err)
 		}
 	}
@@ -484,7 +484,7 @@ func (o *Ossifier) ensureDirectories() error {
 		// .gitkeepファイルを作成してディレクトリを保持
 		gitkeepPath := filepath.Join(docsDir, ".gitkeep")
 		gitkeepContent := "# このファイルはdocsディレクトリを保持するためのものです\n# ドキュメントファイルを追加したら削除してください\n"
-		if err := os.WriteFile(gitkeepPath, []byte(gitkeepContent), 0644); err != nil {
+		if err := os.WriteFile(gitkeepPath, []byte(gitkeepContent), 0600); err != nil {
 			return fmt.Errorf(".gitkeep作成失敗: %w", err)
 		}
 	}
@@ -543,7 +543,7 @@ func (o *Ossifier) ensureConfigFiles() error {
   "rebaseWhen": "conflicted"
 }`
 
-		if err := os.WriteFile(renovatePath, []byte(renovateContent), 0644); err != nil {
+		if err := os.WriteFile(renovatePath, []byte(renovateContent), 0600); err != nil {
 			return fmt.Errorf("Renovate設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -620,7 +620,7 @@ changelog:
     - title: Others
       order: 999`
 
-		if err := os.WriteFile(goreleaserPath, []byte(goreleaserContent), 0644); err != nil {
+		if err := os.WriteFile(goreleaserPath, []byte(goreleaserContent), 0600); err != nil {
 			return fmt.Errorf("GoReleaser設定ファイル作成失敗: %w", err)
 		}
 	}
@@ -708,7 +708,7 @@ issues:
   max-issues-per-linter: 50
   max-same-issues: 3`
 
-		if err := os.WriteFile(golangciPath, []byte(golangciContent), 0644); err != nil {
+		if err := os.WriteFile(golangciPath, []byte(golangciContent), 0600); err != nil {
 			return fmt.Errorf("golangci-lint設定ファイル作成失敗: %w", err)
 		}
 	}

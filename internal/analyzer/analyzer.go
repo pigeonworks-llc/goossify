@@ -15,21 +15,21 @@ type ProjectAnalyzer struct {
 
 // AnalysisResult は分析結果
 type AnalysisResult struct {
-	ProjectPath     string            `json:"project_path"`
-	ProjectName     string            `json:"project_name"`
-	ProjectType     string            `json:"project_type"`
-	OverallScore    int               `json:"overall_score"`     // 0-100
-	Categories      []CategoryResult  `json:"categories"`
-	Missing         []MissingItem     `json:"missing"`
-	Recommendations []Recommendation  `json:"recommendations"`
-	Summary         string            `json:"summary"`
+	ProjectPath     string           `json:"project_path"`
+	ProjectName     string           `json:"project_name"`
+	ProjectType     string           `json:"project_type"`
+	OverallScore    int              `json:"overall_score"` // 0-100
+	Categories      []CategoryResult `json:"categories"`
+	Missing         []MissingItem    `json:"missing"`
+	Recommendations []Recommendation `json:"recommendations"`
+	Summary         string           `json:"summary"`
 }
 
 // CategoryResult はカテゴリ別の結果
 type CategoryResult struct {
 	Name        string `json:"name"`
-	Score       int    `json:"score"`        // 0-100
-	Status      string `json:"status"`       // "good", "warning", "error"
+	Score       int    `json:"score"`  // 0-100
+	Status      string `json:"status"` // "good", "warning", "error"
 	Description string `json:"description"`
 	Items       []Item `json:"items"`
 }
@@ -37,7 +37,7 @@ type CategoryResult struct {
 // Item は個別チェック項目
 type Item struct {
 	Name        string `json:"name"`
-	Status      string `json:"status"`      // "present", "missing", "outdated"
+	Status      string `json:"status"` // "present", "missing", "outdated"
 	Required    bool   `json:"required"`
 	Description string `json:"description"`
 	Path        string `json:"path,omitempty"`
@@ -47,7 +47,7 @@ type Item struct {
 type MissingItem struct {
 	Name        string `json:"name"`
 	Category    string `json:"category"`
-	Priority    string `json:"priority"`    // "high", "medium", "low"
+	Priority    string `json:"priority"` // "high", "medium", "low"
 	Description string `json:"description"`
 	Action      string `json:"action"`
 }
@@ -271,7 +271,7 @@ func (a *ProjectAnalyzer) checkFile(fileName, description string, required bool)
 }
 
 // checkDirectory はディレクトリの存在をチェック
-func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required bool) Item {
+func (a *ProjectAnalyzer) checkDirectory(dirName, description string, _ bool) Item {
 	path := filepath.Join(a.projectPath, dirName)
 	stat, err := os.Stat(path)
 
@@ -283,7 +283,7 @@ func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required b
 	return Item{
 		Name:        dirName + "/",
 		Status:      status,
-		Required:    required,
+		Required:    false,
 		Description: description,
 		Path:        path,
 	}
@@ -292,7 +292,7 @@ func (a *ProjectAnalyzer) checkDirectory(dirName, description string, required b
 // checkTestFiles はテストファイルの存在をチェック
 func (a *ProjectAnalyzer) checkTestFiles(description string, required bool) Item {
 	testFiles := 0
-	filepath.Walk(a.projectPath, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(a.projectPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -426,7 +426,7 @@ func (a *ProjectAnalyzer) extractMissingItems(categories []CategoryResult) []Mis
 					Category:    category.Name,
 					Priority:    priority,
 					Description: item.Description,
-					Action:      fmt.Sprintf("goossify ossify でファイルを生成できます"),
+					Action:      "goossify ossify でファイルを生成できます",
 				})
 			}
 		}

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"github.com/pigeonworks-llc/goossify/internal/ossify"
+	"github.com/spf13/cobra"
 )
 
 var ossifyCmd = &cobra.Command{

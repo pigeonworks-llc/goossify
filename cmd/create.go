@@ -48,7 +48,7 @@ func init() {
 	createCmd.Flags().StringVarP(&createGithub, "github", "g", "", "GitHubユーザー名")
 	createCmd.Flags().BoolVarP(&createInteractive, "interactive", "i", false, "対話的モードで設定")
 
-	createCmd.MarkFlagRequired("template")
+	_ = createCmd.MarkFlagRequired("template")
 }
 
 func runCreate(cmd *cobra.Command, args []string) error {

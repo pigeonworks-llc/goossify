@@ -152,7 +152,32 @@ func collectProjectConfig(projectName string) (*generator.ProjectConfig, error) 
 func collectConfigInteractively(config *generator.ProjectConfig) error {
 	reader := bufio.NewReader(os.Stdin)
 
-	// プロジェクト名
+	if err := promptProjectName(reader, config); err != nil {
+		return err
+	}
+	if err := promptProjectType(reader, config); err != nil {
+		return err
+	}
+	if err := promptDescription(reader, config); err != nil {
+		return err
+	}
+	if err := promptAuthor(reader, config); err != nil {
+		return err
+	}
+	if err := promptEmail(reader, config); err != nil {
+		return err
+	}
+	if err := promptGitHubUsername(reader, config); err != nil {
+		return err
+	}
+	if err := promptLicense(reader, config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func promptProjectName(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Name == "" {
 		fmt.Print("プロジェクト名: ")
 		name, err := reader.ReadString('\n')
@@ -161,8 +186,10 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 		}
 		config.Name = strings.TrimSpace(name)
 	}
+	return nil
+}
 
-	// プロジェクトタイプ
+func promptProjectType(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Type == "" {
 		fmt.Println("\nプロジェクトタイプを選択してください:")
 		fmt.Println("  1. cli-tool  - CLIアプリケーション")
@@ -189,16 +216,20 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 			config.Type = projectTypeCLI
 		}
 	}
+	return nil
+}
 
-	// 説明
+func promptDescription(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	fmt.Print("プロジェクトの説明: ")
 	desc, err := reader.ReadString('\n')
 	if err != nil {
 		return err
 	}
 	config.Description = strings.TrimSpace(desc)
+	return nil
+}
 
-	// 作成者名
+func promptAuthor(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Author == "" {
 		fmt.Print("作成者名: ")
 		authorName, err := reader.ReadString('\n')
@@ -207,8 +238,10 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 		}
 		config.Author = strings.TrimSpace(authorName)
 	}
+	return nil
+}
 
-	// メールアドレス
+func promptEmail(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.Email == "" {
 		fmt.Print("メールアドレス: ")
 		emailAddr, err := reader.ReadString('\n')
@@ -217,8 +250,10 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 		}
 		config.Email = strings.TrimSpace(emailAddr)
 	}
+	return nil
+}
 
-	// GitHubユーザー名
+func promptGitHubUsername(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.GitHubUsername == "" {
 		fmt.Print("GitHubユーザー名: ")
 		username, err := reader.ReadString('\n')
@@ -227,8 +262,10 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 		}
 		config.GitHubUsername = strings.TrimSpace(username)
 	}
+	return nil
+}
 
-	// ライセンス
+func promptLicense(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.License == "" {
 		fmt.Print("ライセンス (MIT): ")
 		licenseType, err := reader.ReadString('\n')
@@ -241,7 +278,6 @@ func collectConfigInteractively(config *generator.ProjectConfig) error {
 		}
 		config.License = license
 	}
-
 	return nil
 }
 
