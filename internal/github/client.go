@@ -26,22 +26,22 @@ type Config struct {
 
 // RepositorySettings はリポジトリ設定
 type RepositorySettings struct {
-	BranchProtection   BranchProtectionSettings
-	Labels            []LabelConfig
-	RequiredReviews   int
-	StatusChecks      []string
-	AutoMerge         bool
+	BranchProtection    BranchProtectionSettings
+	Labels              []LabelConfig
+	RequiredReviews     int
+	StatusChecks        []string
+	AutoMerge           bool
 	DeleteBranchOnMerge bool
 }
 
 // BranchProtectionSettings はブランチ保護設定
 type BranchProtectionSettings struct {
-	Branch                 string
-	RequiredStatusChecks   []string
-	RequiredReviews        int
-	DismissStaleReviews    bool
+	Branch                  string
+	RequiredStatusChecks    []string
+	RequiredReviews         int
+	DismissStaleReviews     bool
 	RequireCodeOwnerReviews bool
-	RestrictPushes         bool
+	RestrictPushes          bool
 }
 
 // LabelConfig はラベル設定
@@ -90,7 +90,7 @@ func (c *Client) SetupRepository(settings *RepositorySettings) error {
 	}
 
 	// 3. リポジトリ一般設定
-	if err := c.updateRepositorySettings(*settings); err != nil {
+	if err := c.updateRepositorySettings(settings); err != nil {
 		return fmt.Errorf("リポジトリ設定失敗: %w", err)
 	}
 
@@ -173,7 +173,7 @@ func (c *Client) setupBranchProtection(config BranchProtectionSettings) error {
 }
 
 // updateRepositorySettings はリポジトリの一般設定を更新
-func (c *Client) updateRepositorySettings(settings RepositorySettings) error {
+func (c *Client) updateRepositorySettings(settings *RepositorySettings) error {
 	repo := &github.Repository{
 		DeleteBranchOnMerge: &settings.DeleteBranchOnMerge,
 	}

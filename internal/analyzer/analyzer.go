@@ -15,21 +15,21 @@ type ProjectAnalyzer struct {
 
 // AnalysisResult は分析結果
 type AnalysisResult struct {
-	ProjectPath     string            `json:"project_path"`
-	ProjectName     string            `json:"project_name"`
-	ProjectType     string            `json:"project_type"`
-	OverallScore    int               `json:"overall_score"`     // 0-100
-	Categories      []CategoryResult  `json:"categories"`
-	Missing         []MissingItem     `json:"missing"`
-	Recommendations []Recommendation  `json:"recommendations"`
-	Summary         string            `json:"summary"`
+	ProjectPath     string           `json:"project_path"`
+	ProjectName     string           `json:"project_name"`
+	ProjectType     string           `json:"project_type"`
+	OverallScore    int              `json:"overall_score"` // 0-100
+	Categories      []CategoryResult `json:"categories"`
+	Missing         []MissingItem    `json:"missing"`
+	Recommendations []Recommendation `json:"recommendations"`
+	Summary         string           `json:"summary"`
 }
 
 // CategoryResult はカテゴリ別の結果
 type CategoryResult struct {
 	Name        string `json:"name"`
-	Score       int    `json:"score"`        // 0-100
-	Status      string `json:"status"`       // "good", "warning", "error"
+	Score       int    `json:"score"`  // 0-100
+	Status      string `json:"status"` // "good", "warning", "error"
 	Description string `json:"description"`
 	Items       []Item `json:"items"`
 }
@@ -37,7 +37,7 @@ type CategoryResult struct {
 // Item は個別チェック項目
 type Item struct {
 	Name        string `json:"name"`
-	Status      string `json:"status"`      // "present", "missing", "outdated"
+	Status      string `json:"status"` // "present", "missing", "outdated"
 	Required    bool   `json:"required"`
 	Description string `json:"description"`
 	Path        string `json:"path,omitempty"`
@@ -47,7 +47,7 @@ type Item struct {
 type MissingItem struct {
 	Name        string `json:"name"`
 	Category    string `json:"category"`
-	Priority    string `json:"priority"`    // "high", "medium", "low"
+	Priority    string `json:"priority"` // "high", "medium", "low"
 	Description string `json:"description"`
 	Action      string `json:"action"`
 }

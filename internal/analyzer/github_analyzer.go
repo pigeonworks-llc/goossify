@@ -19,12 +19,12 @@ type GitHubAnalyzer struct {
 
 // GitHubCheck はGitHub設定のチェック結果
 type GitHubCheck struct {
-	BranchProtection   Item `json:"branch_protection"`
-	RequiredReviews    Item `json:"required_reviews"`
-	StatusChecks       Item `json:"status_checks"`
-	AdminEnforcement   Item `json:"admin_enforcement"`
-	DefaultBranch      Item `json:"default_branch"`
-	SelfReviewAllowed  Item `json:"self_review_allowed"`
+	BranchProtection  Item `json:"branch_protection"`
+	RequiredReviews   Item `json:"required_reviews"`
+	StatusChecks      Item `json:"status_checks"`
+	AdminEnforcement  Item `json:"admin_enforcement"`
+	DefaultBranch     Item `json:"default_branch"`
+	SelfReviewAllowed Item `json:"self_review_allowed"`
 }
 
 // NewGitHubAnalyzer は新しいGitHubAnalyzerを作成
