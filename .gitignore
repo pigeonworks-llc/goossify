@@ -1,0 +1,21 @@
+# Go build outputs
+bin/
+dist/
+build/
+*.exe
+*.exe~
+*.out
+*.test
+*.log
+coverage.*
+*.coverprofile
+
+# IDE/editor settings
+.idea/
+.vscode/
+.DS_Store
+.claude/
+
+# Local binaries
+/goossify
+goossify
