@@ -20,16 +20,16 @@ var (
 // createCmd represents the create command.
 var createCmd = &cobra.Command{
 	Use:   "create [project-name]",
-	Short: "テンプレートから新しいGo OSSプロジェクトを作成",
-	Long: `事前定義されたテンプレートから新しいGo言語のOSSプロジェクトを作成します。
+	Short: "Create a new Go OSS project from a template",
+	Long: `Create a new Go OSS project from a predefined template.
 
-利用可能なテンプレート：
-🔧 cli-tool  - CLIアプリケーション (Cobra使用)
-📚 library   - Go言語ライブラリ・パッケージ
-🌐 web-api   - REST API / GraphQL サーバー
-⚙️  service   - マイクロサービス・デーモン
+Available templates:
+🔧 cli-tool  - CLI application (using Cobra)
+📚 library   - Go library/package
+🌐 web-api   - REST API / GraphQL server
+⚙️  service   - Microservice/daemon
 
-使用例:
+Examples:
   goossify create --template cli-tool my-cli-app
   goossify create --template library my-go-lib
   goossify create --template web-api my-api-server
@@ -41,12 +41,12 @@ var createCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(createCmd)
 
-	createCmd.Flags().StringVarP(&createTemplate, "template", "t", "", "使用するテンプレート (cli-tool|library|web-api|service)")
-	createCmd.Flags().StringVarP(&createAuthor, "author", "a", "", "作成者名")
-	createCmd.Flags().StringVarP(&createEmail, "email", "e", "", "作成者メールアドレス")
-	createCmd.Flags().StringVarP(&createLicense, "license", "l", "MIT", "ライセンス")
-	createCmd.Flags().StringVarP(&createGithub, "github", "g", "", "GitHubユーザー名")
-	createCmd.Flags().BoolVarP(&createInteractive, "interactive", "i", false, "対話的モードで設定")
+	createCmd.Flags().StringVarP(&createTemplate, "template", "t", "", "Template to use (cli-tool|library|web-api|service)")
+	createCmd.Flags().StringVarP(&createAuthor, "author", "a", "", "Author name")
+	createCmd.Flags().StringVarP(&createEmail, "email", "e", "", "Author email address")
+	createCmd.Flags().StringVarP(&createLicense, "license", "l", "MIT", "License type")
+	createCmd.Flags().StringVarP(&createGithub, "github", "g", "", "GitHub username")
+	createCmd.Flags().BoolVarP(&createInteractive, "interactive", "i", false, "Interactive mode")
 
 	_ = createCmd.MarkFlagRequired("template")
 }
@@ -54,12 +54,12 @@ func init() {
 func runCreate(cmd *cobra.Command, args []string) error {
 	projectName := args[0]
 
-	// テンプレートの有効性チェック
+	// Validate template
 	if !isValidTemplate(createTemplate) {
-		return fmt.Errorf("無効なテンプレート: %s\n利用可能: cli-tool, library, web-api, service", createTemplate)
+		return fmt.Errorf("invalid template: %s\nAvailable: cli-tool, library, web-api, service", createTemplate)
 	}
 
-	// プロジェクト設定を収集
+	// Collect project configuration
 	config := &generator.ProjectConfig{
 		Name:           projectName,
 		Type:           createTemplate,
@@ -71,26 +71,26 @@ func runCreate(cmd *cobra.Command, args []string) error {
 
 	if createInteractive || needsInteractiveInput(config) {
 		if err := collectConfigInteractively(config); err != nil {
-			return fmt.Errorf("設定収集に失敗: %w", err)
+			return fmt.Errorf("failed to collect configuration: %w", err)
 		}
 	}
 
-	// デフォルト値設定
+	// Set default values
 	setDefaultValues(config)
 
-	// プロジェクトディレクトリ作成
+	// Create project directory
 	projectPath, err := createProjectDirectory(config.Name)
 	if err != nil {
-		return fmt.Errorf("プロジェクトディレクトリ作成に失敗: %w", err)
+		return fmt.Errorf("failed to create project directory: %w", err)
 	}
 
-	// プロジェクト生成
+	// Generate project
 	gen := generator.New(projectPath, config)
 	if err := gen.Generate(); err != nil {
-		return fmt.Errorf("プロジェクト生成に失敗: %w", err)
+		return fmt.Errorf("failed to generate project: %w", err)
 	}
 
-	fmt.Printf("🎉 Go OSSプロジェクト '%s' (%s) が正常に作成されました！\n\n", config.Name, config.Type)
+	fmt.Printf("🎉 Successfully created Go OSS project '%s' (%s)!\n\n", config.Name, config.Type)
 	printNextSteps(config.Name)
 
 	return nil
@@ -123,17 +123,17 @@ func setDefaultValues(config *generator.ProjectConfig) {
 }
 
 func printNextSteps(projectName string) {
-	fmt.Println("次の手順:")
+	fmt.Println("Next steps:")
 	fmt.Printf("  cd %s\n", projectName)
 	fmt.Println("  go mod tidy")
 	fmt.Println("  git init")
 	fmt.Println("  git add .")
 	fmt.Println("  git commit -m \"🎉 Initial commit\"")
 	fmt.Println()
-	fmt.Println("GitHubリポジトリを作成してプッシュ:")
+	fmt.Println("Create and push to GitHub repository:")
 	fmt.Println("  gh repo create --public")
 	fmt.Println("  git push -u origin main")
 	fmt.Println()
-	fmt.Println("プロジェクト管理:")
-	fmt.Println("  goossify status     # プロジェクト健全性確認")
+	fmt.Println("Project management:")
+	fmt.Println("  goossify status     # Check project health")
 }

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Client はGitHub API操作を行う
+// Client performs GitHub API operations
 type Client struct {
 	client *github.Client
 	owner  string
@@ -17,14 +17,14 @@ type Client struct {
 	ctx    context.Context
 }
 
-// Config はGitHub API設定
+// Config is GitHub API configuration
 type Config struct {
 	Token string
 	Owner string
 	Repo  string
 }
 
-// RepositorySettings はリポジトリ設定
+// RepositorySettings is repository settings
 type RepositorySettings struct {
 	BranchProtection    BranchProtectionSettings
 	Labels              []LabelConfig
@@ -34,7 +34,7 @@ type RepositorySettings struct {
 	DeleteBranchOnMerge bool
 }
 
-// BranchProtectionSettings はブランチ保護設定
+// BranchProtectionSettings is branch protection settings
 type BranchProtectionSettings struct {
 	Branch                  string
 	RequiredStatusChecks    []string
@@ -44,14 +44,14 @@ type BranchProtectionSettings struct {
 	RestrictPushes          bool
 }
 
-// LabelConfig はラベル設定
+// LabelConfig is label configuration
 type LabelConfig struct {
 	Name        string
 	Color       string
 	Description string
 }
 
-// NewClient は新しいGitHub APIクライアントを作成
+// NewClient creates a new GitHub API client
 func NewClient(config Config) (*Client, error) {
 	if config.Token == "" {
 		return nil, fmt.Errorf("GitHub token is required")
@@ -77,32 +77,32 @@ func NewClient(config Config) (*Client, error) {
 	}, nil
 }
 
-// SetupRepository はリポジトリの基本設定を行う
+// SetupRepository configures basic repository settings
 func (c *Client) SetupRepository(settings *RepositorySettings) error {
-	// 1. ラベル設定
+	// 1. Configure labels
 	if err := c.setupLabels(settings.Labels); err != nil {
-		return fmt.Errorf("ラベル設定失敗: %w", err)
+		return fmt.Errorf("failed to setup labels: %w", err)
 	}
 
-	// 2. ブランチ保護設定
+	// 2. Configure branch protection
 	if err := c.setupBranchProtection(settings.BranchProtection); err != nil {
-		return fmt.Errorf("ブランチ保護設定失敗: %w", err)
+		return fmt.Errorf("failed to setup branch protection: %w", err)
 	}
 
-	// 3. リポジトリ一般設定
+	// 3. Configure general repository settings
 	if err := c.updateRepositorySettings(settings); err != nil {
-		return fmt.Errorf("リポジトリ設定失敗: %w", err)
+		return fmt.Errorf("failed to setup repository settings: %w", err)
 	}
 
 	return nil
 }
 
-// setupLabels はラベルを設定
+// setupLabels configures repository labels
 func (c *Client) setupLabels(labels []LabelConfig) error {
-	// 既存ラベル取得
+	// Get existing labels
 	existingLabels, _, err := c.client.Issues.ListLabels(c.ctx, c.owner, c.repo, nil)
 	if err != nil {
-		return fmt.Errorf("既存ラベル取得失敗: %w", err)
+		return fmt.Errorf("failed to get existing labels: %w", err)
 	}
 
 	existingLabelMap := make(map[string]*github.Label)
@@ -110,7 +110,7 @@ func (c *Client) setupLabels(labels []LabelConfig) error {
 		existingLabelMap[*label.Name] = label
 	}
 
-	// ラベル作成・更新
+	// Create or update labels
 	for i := range labels {
 		labelConfig := labels[i]
 		label := &github.Label{
@@ -120,17 +120,17 @@ func (c *Client) setupLabels(labels []LabelConfig) error {
 		}
 
 		if existingLabel, exists := existingLabelMap[labelConfig.Name]; exists {
-			// 更新
+			// Update existing label
 			label.ID = existingLabel.ID
 			_, _, err := c.client.Issues.EditLabel(c.ctx, c.owner, c.repo, labelConfig.Name, label)
 			if err != nil {
-				return fmt.Errorf("ラベル更新失敗 (%s): %w", labelConfig.Name, err)
+				return fmt.Errorf("failed to update label (%s): %w", labelConfig.Name, err)
 			}
 		} else {
-			// 作成
+			// Create new label
 			_, _, err := c.client.Issues.CreateLabel(c.ctx, c.owner, c.repo, label)
 			if err != nil {
-				return fmt.Errorf("ラベル作成失敗 (%s): %w", labelConfig.Name, err)
+				return fmt.Errorf("failed to create label (%s): %w", labelConfig.Name, err)
 			}
 		}
 	}
@@ -138,7 +138,7 @@ func (c *Client) setupLabels(labels []LabelConfig) error {
 	return nil
 }
 
-// setupBranchProtection はブランチ保護を設定
+// setupBranchProtection configures branch protection
 func (c *Client) setupBranchProtection(config BranchProtectionSettings) error {
 	if config.Branch == "" {
 		config.Branch = "main"
@@ -166,13 +166,13 @@ func (c *Client) setupBranchProtection(config BranchProtectionSettings) error {
 
 	_, _, err := c.client.Repositories.UpdateBranchProtection(c.ctx, c.owner, c.repo, config.Branch, protection)
 	if err != nil {
-		return fmt.Errorf("ブランチ保護設定失敗: %w", err)
+		return fmt.Errorf("failed to setup branch protection: %w", err)
 	}
 
 	return nil
 }
 
-// updateRepositorySettings はリポジトリの一般設定を更新
+// updateRepositorySettings updates general repository settings
 func (c *Client) updateRepositorySettings(settings *RepositorySettings) error {
 	repo := &github.Repository{
 		DeleteBranchOnMerge: &settings.DeleteBranchOnMerge,
@@ -180,13 +180,13 @@ func (c *Client) updateRepositorySettings(settings *RepositorySettings) error {
 
 	_, _, err := c.client.Repositories.Edit(c.ctx, c.owner, c.repo, repo)
 	if err != nil {
-		return fmt.Errorf("リポジトリ設定更新失敗: %w", err)
+		return fmt.Errorf("failed to update repository settings: %w", err)
 	}
 
 	return nil
 }
 
-// GetDefaultLabels はデフォルトラベル設定を返す
+// GetDefaultLabels returns default label configuration
 func GetDefaultLabels() []LabelConfig {
 	return []LabelConfig{
 		{Name: "bug", Color: "d73a4a", Description: "Something isn't working"},
@@ -206,9 +206,9 @@ func GetDefaultLabels() []LabelConfig {
 	}
 }
 
-// ParseRepositoryURL はGitHub URLからowner/repoを抽出
+// ParseRepositoryURL extracts owner/repo from GitHub URL
 func ParseRepositoryURL(url string) (owner, repo string, err error) {
-	// https://github.com/owner/repo.git の形式を想定
+	// Expected format: https://github.com/owner/repo.git
 	url = strings.TrimSuffix(url, ".git")
 	url = strings.TrimPrefix(url, "https://github.com/")
 	url = strings.TrimPrefix(url, "git@github.com:")

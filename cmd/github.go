@@ -17,57 +17,57 @@ var (
 
 var githubCmd = &cobra.Command{
 	Use:   "github",
-	Short: "GitHub リポジトリ設定の自動化",
-	Long: `GitHub API を使用してリポジトリの設定を自動化します。
+	Short: "Automate GitHub repository configuration",
+	Long: `Automate repository configuration using the GitHub API.
 
-このコマンドは以下を設定します：
-• ブランチ保護ルール
-• ラベル設定
-• リポジトリ一般設定
+This command configures:
+• Branch protection rules
+• Label settings
+• General repository settings
 
-GitHub Personal Access Token が必要です。`,
+A GitHub Personal Access Token is required.`,
 }
 
 var githubSetupCmd = &cobra.Command{
 	Use:   "setup",
-	Short: "GitHub リポジトリの基本設定を実行",
+	Short: "Execute basic GitHub repository setup",
 	RunE:  runGitHubSetup,
 }
 
 func runGitHubSetup(cmd *cobra.Command, args []string) error {
-	// GitHub token確認
+	// Check GitHub token
 	token := githubToken
 	if token == "" {
 		token = os.Getenv("GITHUB_TOKEN")
 	}
 	if token == "" {
-		return fmt.Errorf("GitHub token が必要です。--token フラグか GITHUB_TOKEN 環境変数を設定してください")
+		return fmt.Errorf("GitHub token is required. Set --token flag or GITHUB_TOKEN environment variable")
 	}
 
-	// Git remote URLからowner/repo取得
+	// Get owner/repo from git remote URL
 	owner, repo, err := getRepositoryInfo()
 	if err != nil {
-		return fmt.Errorf("リポジトリ情報取得失敗: %w", err)
+		return fmt.Errorf("failed to get repository info: %w", err)
 	}
 
-	fmt.Printf("🔧 GitHub リポジトリ設定を開始します: %s/%s\n", owner, repo)
+	fmt.Printf("🔧 Starting GitHub repository setup: %s/%s\n", owner, repo)
 
 	if dryRun {
-		fmt.Println("🔍 ドライランモード: 実際の設定は行いません")
+		fmt.Println("🔍 Dry-run mode: no actual changes will be made")
 		return nil
 	}
 
-	// GitHub クライアント作成
+	// Create GitHub client
 	client, err := github.NewClient(github.Config{
 		Token: token,
 		Owner: owner,
 		Repo:  repo,
 	})
 	if err != nil {
-		return fmt.Errorf("GitHub クライアント作成失敗: %w", err)
+		return fmt.Errorf("failed to create GitHub client: %w", err)
 	}
 
-	// デフォルト設定で実行
+	// Execute with default settings
 	settings := github.RepositorySettings{
 		BranchProtection: github.BranchProtectionSettings{
 			Branch:                  "main",
@@ -82,10 +82,10 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := client.SetupRepository(&settings); err != nil {
-		return fmt.Errorf("リポジトリ設定失敗: %w", err)
+		return fmt.Errorf("failed to setup repository: %w", err)
 	}
 
-	fmt.Println("✅ GitHub リポジトリ設定が完了しました")
+	fmt.Println("✅ GitHub repository setup completed")
 	return nil
 }
 
@@ -94,7 +94,7 @@ func getRepositoryInfo() (owner, repo string, err error) {
 	cmd := exec.Command("git", "remote", "get-url", "origin")
 	output, err := cmd.Output()
 	if err != nil {
-		return "", "", fmt.Errorf("git remote URL 取得失敗: %w", err)
+		return "", "", fmt.Errorf("failed to get git remote URL: %w", err)
 	}
 
 	remoteURL := strings.TrimSpace(string(output))
@@ -106,5 +106,5 @@ func init() {
 	githubCmd.AddCommand(githubSetupCmd)
 
 	githubSetupCmd.Flags().StringVar(&githubToken, "token", "", "GitHub Personal Access Token")
-	githubSetupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "設定内容を表示するのみで実際の変更は行わない")
+	githubSetupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Display settings only without making actual changes")
 }
