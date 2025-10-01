@@ -1,0 +1,10 @@
+integrations:
+  github:
+    branch_protection: true
+    required_reviews: 1
+    require_code_owner_reviews: true
+    status_checks:
+      - "test (1.24)"
+      - "test (1.25)"
+      - "lint"
+    delete_branch_on_merge: true
