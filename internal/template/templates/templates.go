@@ -208,7 +208,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `
 
 // Makefile template
-const MakefileTemplate = `.PHONY: build test clean lint fmt vet coverage help
+const MakefileTemplate = `.PHONY: build test clean lint fmt vet coverage bench security ci release release-snapshot install tidy deps dev help
 
 # Build variables
 BINARY_NAME={{.Name}}
@@ -245,6 +245,17 @@ coverage: test
 	@echo "Generating coverage report..."
 	${GOCMD} tool cover -html=coverage.out -o coverage.html
 
+# Run benchmarks
+bench:
+	@echo "Running benchmarks..."
+	${GOTEST} -bench=. -benchmem ./...
+
+# Run security checks
+security:
+	@echo "Running security checks..."
+	@command -v govulncheck >/dev/null 2>&1 || { echo "govulncheck not installed. Run: go install golang.org/x/vuln/cmd/govulncheck@latest"; exit 1; }
+	govulncheck ./...
+
 # Clean build artifacts
 clean:
 	@echo "Cleaning..."
@@ -271,19 +282,32 @@ lint:
 tidy:
 	@echo "Tidying dependencies..."
 	${GOMOD} tidy
+	${GOMOD} verify
 
 # Install dependencies
 deps:
 	@echo "Installing dependencies..."
-	${GOGET} -u ./...
+	${GOMOD} download
+	${GOMOD} verify
 
 # Development workflow
 dev: fmt vet lint test
 
+# CI workflow
+ci: fmt vet lint test build
+	@echo "All CI checks passed!"
+
 # Release build (cross-platform)
 release:
 	@echo "Building release..."
+	@command -v goreleaser >/dev/null 2>&1 || { echo "goreleaser not installed. See: https://goreleaser.com/install/"; exit 1; }
 	goreleaser release --clean
+
+# Release snapshot (local testing)
+release-snapshot:
+	@echo "Building release snapshot..."
+	@command -v goreleaser >/dev/null 2>&1 || { echo "goreleaser not installed. See: https://goreleaser.com/install/"; exit 1; }
+	goreleaser release --snapshot --clean
 
 # Install the binary
 install:
@@ -293,19 +317,23 @@ install:
 # Help
 help:
 	@echo "Available targets:"
-	@echo "  build     - Build the binary"
-	@echo "  test      - Run tests"
-	@echo "  coverage  - Run tests with coverage"
-	@echo "  clean     - Clean build artifacts"
-	@echo "  fmt       - Format code"
-	@echo "  vet       - Vet code"
-	@echo "  lint      - Run linter"
-	@echo "  tidy      - Tidy dependencies"
-	@echo "  deps      - Install dependencies"
-	@echo "  dev       - Run development workflow"
-	@echo "  release   - Build release"
-	@echo "  install   - Install binary"
-	@echo "  help      - Show this help"
+	@echo "  build            - Build the binary"
+	@echo "  test             - Run tests"
+	@echo "  coverage         - Run tests with coverage"
+	@echo "  bench            - Run benchmarks"
+	@echo "  security         - Run security checks (govulncheck)"
+	@echo "  clean            - Clean build artifacts"
+	@echo "  fmt              - Format code"
+	@echo "  vet              - Vet code"
+	@echo "  lint             - Run linter"
+	@echo "  tidy             - Tidy dependencies"
+	@echo "  deps             - Install dependencies"
+	@echo "  dev              - Run development workflow"
+	@echo "  ci               - Run all CI checks"
+	@echo "  release          - Build release with goreleaser"
+	@echo "  release-snapshot - Build snapshot release (local)"
+	@echo "  install          - Install binary to GOPATH"
+	@echo "  help             - Show this help"
 `
 
 // CHANGELOG.md template

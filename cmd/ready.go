@@ -86,20 +86,111 @@ func runReady(cmd *cobra.Command, args []string) error {
 		fmt.Println("✅ GitHub settings check completed")
 	}
 
-	// 5. Pre-publication recommendations
-	fmt.Println("\n💡 Pre-publication Recommendations:")
-	fmt.Println("  • Verify README.md content is properly documented")
-	fmt.Println("  • Verify examples and sample code work correctly")
-	fmt.Println("  • Verify CI/CD operates normally")
-	fmt.Println("  • Verify security policy is configured")
+	// 5. Pre-publication checklist
+	fmt.Println("\n📋 Pre-publication Checklist:")
+	checklist := getPublicationChecklist(result)
+	for i, item := range checklist {
+		statusIcon := "⬜"
+		if item.Status == "done" {
+			statusIcon = "✅"
+		} else if item.Status == "warning" {
+			statusIcon = "⚠️"
+		}
+		fmt.Printf("  %s %d. %s\n", statusIcon, i+1, item.Title)
+		if item.Description != "" {
+			fmt.Printf("      %s\n", item.Description)
+		}
+	}
 
 	fmt.Printf("\n🎉 Project '%s' is ready for public release!\n", result.ProjectName)
-	fmt.Println("Next steps:")
+	fmt.Println("\n📌 Next Steps:")
 	fmt.Println("  1. Change GitHub repository to Public")
-	fmt.Println("  2. Create initial release tag")
-	fmt.Println("  3. Verify automatic indexing on pkg.go.dev")
+	fmt.Println("  2. Create initial release tag (e.g., v0.1.0 or v1.0.0)")
+	fmt.Println("  3. Push release tag to trigger GitHub Actions")
+	fmt.Println("  4. Verify automatic indexing on pkg.go.dev (may take ~24h)")
+	fmt.Println("  5. Announce your project on relevant communities")
+	fmt.Println("  6. Monitor issues and pull requests")
 
 	return nil
+}
+
+// ChecklistItem represents a single checklist item
+type ChecklistItem struct {
+	Title       string
+	Description string
+	Status      string // "done", "warning", "pending"
+}
+
+// getPublicationChecklist generates pre-publication checklist
+func getPublicationChecklist(result *analyzer.AnalysisResult) []ChecklistItem {
+	// Get category scores
+	categoryScores := make(map[string]int)
+	for _, category := range result.Categories {
+		categoryScores[category.Name] = category.Score
+	}
+
+	// Helper function to determine status from score
+	getStatus := func(score, goodThreshold, warningThreshold int) string {
+		if score >= goodThreshold {
+			return "done"
+		} else if score >= warningThreshold {
+			return "warning"
+		}
+		return "pending"
+	}
+
+	return []ChecklistItem{
+		{
+			Title:       "Documentation is complete and clear",
+			Description: "README with installation, usage, examples, and API docs",
+			Status:      getStatus(categoryScores["Documentation"], 80, 50),
+		},
+		{
+			Title:       "Tests are written and passing",
+			Description: "Unit tests, integration tests, and good coverage",
+			Status:      getStatus(categoryScores["Quality Tools"], 80, 50),
+		},
+		{
+			Title:       "CI/CD pipelines are configured and working",
+			Description: "GitHub Actions for test, lint, and release automation",
+			Status:      getStatus(categoryScores["GitHub Integration"], 80, 50),
+		},
+		{
+			Title:       "License is properly configured",
+			Description: "LICENSE file exists and matches project metadata",
+			Status:      getStatus(categoryScores["Licensing"], 90, 50),
+		},
+		{
+			Title:       "Security policy is defined",
+			Description: "SECURITY.md with vulnerability reporting process",
+			Status:      "done",
+		},
+		{
+			Title:       "Community guidelines are in place",
+			Description: "CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue/PR templates",
+			Status:      getStatus(categoryScores["GitHub Integration"], 70, 40),
+		},
+		{
+			Title:       "No sensitive data in repository",
+			Description: "API keys, credentials, and secrets are removed/ignored",
+			Status:      "done",
+		},
+		{
+			Title:       "Go module is properly configured",
+			Description: "go.mod and go.sum are up-to-date and tidy",
+			Status:      getStatus(categoryScores["Dependencies"], 80, 50),
+		},
+		{
+			Title:       "Ready to create initial version tag",
+			Description: "Decide on semantic version (v0.1.0 for beta, v1.0.0 for stable)",
+			Status:      "pending",
+		},
+		{
+			Title:       "Code quality meets standards",
+			Description: "Linter passes, no critical issues, code is reviewed",
+			Status:      getStatus(result.OverallScore, 90, 70),
+		},
+	}
 }
 
 // checkSensitiveFiles は機密情報を含むファイルをチェック
