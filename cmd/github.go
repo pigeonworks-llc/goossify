@@ -109,6 +109,7 @@ func loadGitHubSettings() (*github.RepositorySettings, error) {
 	// GitHub設定を読み込み
 	branchProtection := v.GetBool("integrations.github.branch_protection")
 	requiredReviews := v.GetInt("integrations.github.required_reviews")
+	requireCodeOwnerReviews := v.GetBool("integrations.github.require_code_owner_reviews")
 	statusChecks := v.GetStringSlice("integrations.github.status_checks")
 	deleteBranchOnMerge := v.GetBool("integrations.github.delete_branch_on_merge")
 
@@ -131,7 +132,7 @@ func loadGitHubSettings() (*github.RepositorySettings, error) {
 			RequiredStatusChecks:    statusChecks,
 			RequiredReviews:         requiredReviews,
 			DismissStaleReviews:     true,
-			RequireCodeOwnerReviews: false,
+			RequireCodeOwnerReviews: requireCodeOwnerReviews,
 			RestrictPushes:          false,
 		}
 	}
