@@ -123,138 +123,74 @@ type ChecklistItem struct {
 
 // getPublicationChecklist generates pre-publication checklist
 func getPublicationChecklist(result *analyzer.AnalysisResult) []ChecklistItem {
-	checklist := []ChecklistItem{}
-
-	// 1. Documentation
-	docStatus := "pending"
+	// Get category scores
+	categoryScores := make(map[string]int)
 	for _, category := range result.Categories {
-		if category.Name == "Documentation" {
-			if category.Score >= 80 {
-				docStatus = "done"
-			} else if category.Score >= 50 {
-				docStatus = "warning"
-			}
+		categoryScores[category.Name] = category.Score
+	}
+
+	// Helper function to determine status from score
+	getStatus := func(score, goodThreshold, warningThreshold int) string {
+		if score >= goodThreshold {
+			return "done"
+		} else if score >= warningThreshold {
+			return "warning"
 		}
+		return "pending"
 	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Documentation is complete and clear",
-		Description: "README with installation, usage, examples, and API docs",
-		Status:      docStatus,
-	})
 
-	// 2. Tests
-	testStatus := "pending"
-	for _, category := range result.Categories {
-		if category.Name == "Quality Tools" {
-			if category.Score >= 80 {
-				testStatus = "done"
-			} else if category.Score >= 50 {
-				testStatus = "warning"
-			}
-		}
+	return []ChecklistItem{
+		{
+			Title:       "Documentation is complete and clear",
+			Description: "README with installation, usage, examples, and API docs",
+			Status:      getStatus(categoryScores["Documentation"], 80, 50),
+		},
+		{
+			Title:       "Tests are written and passing",
+			Description: "Unit tests, integration tests, and good coverage",
+			Status:      getStatus(categoryScores["Quality Tools"], 80, 50),
+		},
+		{
+			Title:       "CI/CD pipelines are configured and working",
+			Description: "GitHub Actions for test, lint, and release automation",
+			Status:      getStatus(categoryScores["GitHub Integration"], 80, 50),
+		},
+		{
+			Title:       "License is properly configured",
+			Description: "LICENSE file exists and matches project metadata",
+			Status:      getStatus(categoryScores["Licensing"], 90, 50),
+		},
+		{
+			Title:       "Security policy is defined",
+			Description: "SECURITY.md with vulnerability reporting process",
+			Status:      "done",
+		},
+		{
+			Title:       "Community guidelines are in place",
+			Description: "CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue/PR templates",
+			Status:      getStatus(categoryScores["GitHub Integration"], 70, 40),
+		},
+		{
+			Title:       "No sensitive data in repository",
+			Description: "API keys, credentials, and secrets are removed/ignored",
+			Status:      "done",
+		},
+		{
+			Title:       "Go module is properly configured",
+			Description: "go.mod and go.sum are up-to-date and tidy",
+			Status:      getStatus(categoryScores["Dependencies"], 80, 50),
+		},
+		{
+			Title:       "Ready to create initial version tag",
+			Description: "Decide on semantic version (v0.1.0 for beta, v1.0.0 for stable)",
+			Status:      "pending",
+		},
+		{
+			Title:       "Code quality meets standards",
+			Description: "Linter passes, no critical issues, code is reviewed",
+			Status:      getStatus(result.OverallScore, 90, 70),
+		},
 	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Tests are written and passing",
-		Description: "Unit tests, integration tests, and good coverage",
-		Status:      testStatus,
-	})
-
-	// 3. CI/CD
-	ciStatus := "pending"
-	for _, category := range result.Categories {
-		if category.Name == "GitHub Integration" {
-			if category.Score >= 80 {
-				ciStatus = "done"
-			} else if category.Score >= 50 {
-				ciStatus = "warning"
-			}
-		}
-	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "CI/CD pipelines are configured and working",
-		Description: "GitHub Actions for test, lint, and release automation",
-		Status:      ciStatus,
-	})
-
-	// 4. License
-	licenseStatus := "pending"
-	for _, category := range result.Categories {
-		if category.Name == "Licensing" {
-			if category.Score >= 90 {
-				licenseStatus = "done"
-			} else if category.Score >= 50 {
-				licenseStatus = "warning"
-			}
-		}
-	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "License is properly configured",
-		Description: "LICENSE file exists and matches project metadata",
-		Status:      licenseStatus,
-	})
-
-	// 5. Security
-	securityStatus := "done" // Assumed OK if passed earlier checks
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Security policy is defined",
-		Description: "SECURITY.md with vulnerability reporting process",
-		Status:      securityStatus,
-	})
-
-	// 6. Community files
-	communityStatus := "done" // Assumed OK based on GitHub Integration score
-	for _, category := range result.Categories {
-		if category.Name == "GitHub Integration" && category.Score < 70 {
-			communityStatus = "warning"
-		}
-	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Community guidelines are in place",
-		Description: "CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue/PR templates",
-		Status:      communityStatus,
-	})
-
-	// 7. Sensitive data
-	checklist = append(checklist, ChecklistItem{
-		Title:       "No sensitive data in repository",
-		Description: "API keys, credentials, and secrets are removed/ignored",
-		Status:      "done",
-	})
-
-	// 8. Go module
-	moduleStatus := "done"
-	for _, category := range result.Categories {
-		if category.Name == "Dependencies" && category.Score < 80 {
-			moduleStatus = "warning"
-		}
-	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Go module is properly configured",
-		Description: "go.mod and go.sum are up-to-date and tidy",
-		Status:      moduleStatus,
-	})
-
-	// 9. Version tag
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Ready to create initial version tag",
-		Description: "Decide on semantic version (v0.1.0 for beta, v1.0.0 for stable)",
-		Status:      "pending",
-	})
-
-	// 10. Code quality
-	qualityStatus := "pending"
-	if result.OverallScore >= 90 {
-		qualityStatus = "done"
-	} else if result.OverallScore >= 70 {
-		qualityStatus = "warning"
-	}
-	checklist = append(checklist, ChecklistItem{
-		Title:       "Code quality meets standards",
-		Description: "Linter passes, no critical issues, code is reviewed",
-		Status:      qualityStatus,
-	})
-
-	return checklist
 }
 
 // checkSensitiveFiles は機密情報を含むファイルをチェック

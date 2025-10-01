@@ -506,34 +506,38 @@ func (a *ProjectAnalyzer) getCategoryRecommendations(result *AnalysisResult) []R
 
 		case "GitHub Integration":
 			if category.Score < 70 {
-				recommendations = append(recommendations, Recommendation{
-					Title:       "GitHub統合の強化",
-					Description: "CI/CD自動化、Issue/PRテンプレート、Dependabotを設定してプロジェクト管理を効率化しましょう",
-					Command:     "goossify ossify .",
-					Priority:    "medium",
-				})
-				recommendations = append(recommendations, Recommendation{
-					Title:       "GitHub Actionsワークフローの追加",
-					Description: "テスト、Lint、リリース自動化のためのGitHub Actionsを設定してください",
-					Command:     "# .github/workflows/ci.ymlを確認・カスタマイズ",
-					Priority:    "medium",
-				})
+				recommendations = append(recommendations,
+					Recommendation{
+						Title:       "GitHub統合の強化",
+						Description: "CI/CD自動化、Issue/PRテンプレート、Dependabotを設定してプロジェクト管理を効率化しましょう",
+						Command:     "goossify ossify .",
+						Priority:    "medium",
+					},
+					Recommendation{
+						Title:       "GitHub Actionsワークフローの追加",
+						Description: "テスト、Lint、リリース自動化のためのGitHub Actionsを設定してください",
+						Command:     "# .github/workflows/ci.ymlを確認・カスタマイズ",
+						Priority:    "medium",
+					},
+				)
 			}
 
 		case "Quality Tools":
 			if category.Score < 70 {
-				recommendations = append(recommendations, Recommendation{
-					Title:       "コード品質ツールの導入",
-					Description: "golangci-lint設定、テストカバレッジ計測、ベンチマークを追加してコード品質を向上させましょう",
-					Command:     "make lint && make test && make bench",
-					Priority:    "high",
-				})
-				recommendations = append(recommendations, Recommendation{
-					Title:       "テストカバレッジの向上",
-					Description: "テストカバレッジを80%以上に保つことを推奨します",
-					Command:     "make coverage",
-					Priority:    "medium",
-				})
+				recommendations = append(recommendations,
+					Recommendation{
+						Title:       "コード品質ツールの導入",
+						Description: "golangci-lint設定、テストカバレッジ計測、ベンチマークを追加してコード品質を向上させましょう",
+						Command:     "make lint && make test && make bench",
+						Priority:    "high",
+					},
+					Recommendation{
+						Title:       "テストカバレッジの向上",
+						Description: "テストカバレッジを80%以上に保つことを推奨します",
+						Command:     "make coverage",
+						Priority:    "medium",
+					},
+				)
 			}
 
 		case "Dependencies":
@@ -553,33 +557,34 @@ func (a *ProjectAnalyzer) getCategoryRecommendations(result *AnalysisResult) []R
 
 // getBestPractices はベストプラクティス提案を生成
 func (a *ProjectAnalyzer) getBestPractices(result *AnalysisResult) []Recommendation {
-	var recommendations []Recommendation
+	recommendations := []Recommendation{
+		{
+			Title:       "READMEにバッジを追加",
+			Description: "CI status、カバレッジ、Go Report Card、ライセンスバッジを追加して、プロジェクトの信頼性を視覚的に示しましょう",
+			Command:     "# https://shields.io/ でバッジを生成",
+			Priority:    "low",
+		},
+		{
+			Title:       "セマンティックバージョニングの採用",
+			Description: "v1.0.0形式のバージョンタグを使用し、CHANGELOGまたはGitHub Release Notesで変更履歴を管理しましょう",
+			Command:     "git tag -a v0.1.0 -m 'Initial release'",
+			Priority:    "medium",
+		},
+		{
+			Title:       "GitHub Release Notesの自動生成",
+			Description: "GoReleaserを使用してリリースノートを自動生成し、配布物を自動作成しましょう",
+			Command:     "make release",
+			Priority:    "medium",
+		},
+		{
+			Title:       "定期的なセキュリティスキャン",
+			Description: "GitHub DependabotとCodeQLを有効化して、脆弱性を自動検出しましょう",
+			Command:     "# .github/dependabot.ymlを確認",
+			Priority:    "medium",
+		},
+	}
 
-	// バッジの追加
-	recommendations = append(recommendations, Recommendation{
-		Title:       "READMEにバッジを追加",
-		Description: "CI status、カバレッジ、Go Report Card、ライセンスバッジを追加して、プロジェクトの信頼性を視覚的に示しましょう",
-		Command:     "# https://shields.io/ でバッジを生成",
-		Priority:    "low",
-	})
-
-	// セマンティックバージョニング
-	recommendations = append(recommendations, Recommendation{
-		Title:       "セマンティックバージョニングの採用",
-		Description: "v1.0.0形式のバージョンタグを使用し、CHANGELOGまたはGitHub Release Notesで変更履歴を管理しましょう",
-		Command:     "git tag -a v0.1.0 -m 'Initial release'",
-		Priority:    "medium",
-	})
-
-	// GitHub Release Notes自動生成
-	recommendations = append(recommendations, Recommendation{
-		Title:       "GitHub Release Notesの自動生成",
-		Description: "GoReleaserを使用してリリースノートを自動生成し、配布物を自動作成しましょう",
-		Command:     "make release",
-		Priority:    "medium",
-	})
-
-	// pkg.go.dev
+	// pkg.go.dev (high score only)
 	if result.OverallScore >= 80 {
 		recommendations = append(recommendations, Recommendation{
 			Title:       "pkg.go.devへの公開",
@@ -588,14 +593,6 @@ func (a *ProjectAnalyzer) getBestPractices(result *AnalysisResult) []Recommendat
 			Priority:    "low",
 		})
 	}
-
-	// セキュリティスキャン
-	recommendations = append(recommendations, Recommendation{
-		Title:       "定期的なセキュリティスキャン",
-		Description: "GitHub DependabotとCodeQLを有効化して、脆弱性を自動検出しましょう",
-		Command:     "# .github/dependabot.ymlを確認",
-		Priority:    "medium",
-	})
 
 	return recommendations
 }
