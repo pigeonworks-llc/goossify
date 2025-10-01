@@ -118,7 +118,25 @@ goossify ready --github-token ghp_xxxxxxxxxxxx .
 goossify ready .
 ```
 
-### 5. **Go Public** 🌍
+### 5. **Setup GitHub Repository Settings** ⚙️
+
+```bash
+# Automatically setup branch protection and repository settings
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+goossify github setup
+
+# Preview settings without applying (dry-run)
+goossify github setup --dry-run
+
+# Uses .goossify.yml configuration:
+# - Branch protection (main branch)
+# - Required reviews (configurable)
+# - Status checks (test, lint, etc.)
+# - Auto-delete branches after merge
+# - Labels setup
+```
+
+### 6. **Go Public** 🌍
 
 - Change GitHub repository to **Public**
 - Create initial release tag
@@ -210,6 +228,41 @@ goossify ready --github-token TOKEN .     # Include GitHub settings check
 - 📜 License Consistency
 - 🐙 GitHub Configuration (optional)
 
+### `goossify github setup` ✅
+Automatically configure GitHub repository settings
+
+```bash
+# Setup using .goossify.yml configuration
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+goossify github setup
+
+# Preview settings (dry-run mode)
+goossify github setup --dry-run
+
+# With explicit token
+goossify github setup --token ghp_xxxxxxxxxxxx
+```
+
+**Configured Settings:**
+- 🛡️ **Branch Protection** (main branch)
+  - Required status checks (test, lint, security, etc.)
+  - Required pull request reviews
+  - Dismiss stale reviews
+- 🏷️ **Repository Labels** (standardized labels for issues/PRs)
+- ⚙️ **Repository Settings**
+  - Auto-delete branches after merge
+  - Other repository preferences
+
+**Configuration File (.goossify.yml):**
+```yaml
+integrations:
+  github:
+    branch_protection: true
+    required_reviews: 2
+    status_checks: ["test", "lint", "security"]
+    delete_branch_on_merge: true
+```
+
 ### `goossify create` 🚧
 Create new projects from templates (Planned)
 
@@ -224,8 +277,8 @@ goossify create --template library my-lib
 |---------|--------|-------------|
 | 🏗️ `ossify` | ✅ **Complete** | Convert existing projects to OSS |
 | 📊 `status` | ✅ **Complete** | Health analysis & scoring |
-| 🚀 `ready` | ✅ **Complete** | Public release readiness check |
-| 🐙 GitHub Integration | ✅ **Complete** | Branch protection, settings analysis |
+| 🚀 `ready` | ✅ **Complete** | Pre-publication checklist |
+| 🐙 `github setup` | ✅ **Complete** | Auto-configure repository settings |
 | 🔧 `create` | 🚧 **Planned** | Template-based project creation |
 | 🎯 `init` | 🚧 **Planned** | Interactive project initialization |
 | 📈 `release` | 🚧 **Planned** | Automated release management |
