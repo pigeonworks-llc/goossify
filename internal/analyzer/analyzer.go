@@ -439,36 +439,163 @@ func (a *ProjectAnalyzer) extractMissingItems(categories []CategoryResult) []Mis
 func (a *ProjectAnalyzer) generateRecommendations(result *AnalysisResult) []Recommendation {
 	var recommendations []Recommendation
 
-	// 総合スコアに基づく推奨
-	if result.OverallScore < 50 {
+	// スコア別総合推奨
+	recommendations = append(recommendations, a.getScoreBasedRecommendations(result)...)
+
+	// カテゴリ別詳細推奨
+	recommendations = append(recommendations, a.getCategoryRecommendations(result)...)
+
+	// ベストプラクティス提案
+	recommendations = append(recommendations, a.getBestPractices(result)...)
+
+	return recommendations
+}
+
+// getScoreBasedRecommendations はスコア別推奨を生成
+func (a *ProjectAnalyzer) getScoreBasedRecommendations(result *AnalysisResult) []Recommendation {
+	var recommendations []Recommendation
+
+	if result.OverallScore >= 90 {
 		recommendations = append(recommendations, Recommendation{
-			Title:       "OSS基本ファイルの追加",
-			Description: "プロジェクトにOSSとして必要な基本ファイルが不足しています",
+			Title:       "プロジェクト準備完了！",
+			Description: "OSS公開の準備が整っています。pkg.go.devへの公開を検討してください",
+			Command:     "goossify ready .",
+			Priority:    "low",
+		})
+	} else if result.OverallScore >= 80 {
+		recommendations = append(recommendations, Recommendation{
+			Title:       "もう少しで完璧です",
+			Description: "いくつかの推奨項目を追加すると、より良いOSSプロジェクトになります",
+			Command:     "goossify status . --format json",
+			Priority:    "low",
+		})
+	} else if result.OverallScore >= 60 {
+		recommendations = append(recommendations, Recommendation{
+			Title:       "重要な改善が必要",
+			Description: "OSS公開前に不足している重要項目を追加してください",
+			Command:     "goossify ossify .",
+			Priority:    "medium",
+		})
+	} else {
+		recommendations = append(recommendations, Recommendation{
+			Title:       "基本設定から始めましょう",
+			Description: "OSSプロジェクトに必要な基本ファイルが大幅に不足しています",
 			Command:     "goossify ossify .",
 			Priority:    "high",
 		})
 	}
 
-	// カテゴリ別推奨
+	return recommendations
+}
+
+// getCategoryRecommendations はカテゴリ別推奨を生成
+func (a *ProjectAnalyzer) getCategoryRecommendations(result *AnalysisResult) []Recommendation {
+	var recommendations []Recommendation
+
 	for _, category := range result.Categories {
-		if category.Status == "error" {
-			switch category.Name {
-			case "GitHub統合":
+		switch category.Name {
+		case "Documentation":
+			if category.Score < 80 {
 				recommendations = append(recommendations, Recommendation{
-					Title:       "GitHub統合の改善",
-					Description: "CI/CDやIssue/PRテンプレートを追加してGitHub連携を強化しましょう",
+					Title:       "ドキュメントの充実",
+					Description: "README.mdにインストール手順、使用例、API docを追加してください。examplesディレクトリに実用的なサンプルコードを配置すると、ユーザーの理解が深まります",
+					Command:     "# README.mdを編集して、Installation/Usage/Examplesセクションを追加",
+					Priority:    "high",
+				})
+			}
+
+		case "GitHub Integration":
+			if category.Score < 70 {
+				recommendations = append(recommendations, Recommendation{
+					Title:       "GitHub統合の強化",
+					Description: "CI/CD自動化、Issue/PRテンプレート、Dependabotを設定してプロジェクト管理を効率化しましょう",
 					Command:     "goossify ossify .",
 					Priority:    "medium",
 				})
-			case "品質ツール":
 				recommendations = append(recommendations, Recommendation{
-					Title:       "品質ツールの導入",
-					Description: "Linter設定やテストの追加でコード品質を向上させましょう",
+					Title:       "GitHub Actionsワークフローの追加",
+					Description: "テスト、Lint、リリース自動化のためのGitHub Actionsを設定してください",
+					Command:     "# .github/workflows/ci.ymlを確認・カスタマイズ",
 					Priority:    "medium",
+				})
+			}
+
+		case "Quality Tools":
+			if category.Score < 70 {
+				recommendations = append(recommendations, Recommendation{
+					Title:       "コード品質ツールの導入",
+					Description: "golangci-lint設定、テストカバレッジ計測、ベンチマークを追加してコード品質を向上させましょう",
+					Command:     "make lint && make test && make bench",
+					Priority:    "high",
+				})
+				recommendations = append(recommendations, Recommendation{
+					Title:       "テストカバレッジの向上",
+					Description: "テストカバレッジを80%以上に保つことを推奨します",
+					Command:     "make coverage",
+					Priority:    "medium",
+				})
+			}
+
+		case "Dependencies":
+			if category.Score < 80 {
+				recommendations = append(recommendations, Recommendation{
+					Title:       "依存関係の管理",
+					Description: "go mod tidyを実行し、govulncheckで脆弱性をチェックしてください",
+					Command:     "make tidy && make security",
+					Priority:    "high",
 				})
 			}
 		}
 	}
+
+	return recommendations
+}
+
+// getBestPractices はベストプラクティス提案を生成
+func (a *ProjectAnalyzer) getBestPractices(result *AnalysisResult) []Recommendation {
+	var recommendations []Recommendation
+
+	// バッジの追加
+	recommendations = append(recommendations, Recommendation{
+		Title:       "READMEにバッジを追加",
+		Description: "CI status、カバレッジ、Go Report Card、ライセンスバッジを追加して、プロジェクトの信頼性を視覚的に示しましょう",
+		Command:     "# https://shields.io/ でバッジを生成",
+		Priority:    "low",
+	})
+
+	// セマンティックバージョニング
+	recommendations = append(recommendations, Recommendation{
+		Title:       "セマンティックバージョニングの採用",
+		Description: "v1.0.0形式のバージョンタグを使用し、CHANGELOGまたはGitHub Release Notesで変更履歴を管理しましょう",
+		Command:     "git tag -a v0.1.0 -m 'Initial release'",
+		Priority:    "medium",
+	})
+
+	// GitHub Release Notes自動生成
+	recommendations = append(recommendations, Recommendation{
+		Title:       "GitHub Release Notesの自動生成",
+		Description: "GoReleaserを使用してリリースノートを自動生成し、配布物を自動作成しましょう",
+		Command:     "make release",
+		Priority:    "medium",
+	})
+
+	// pkg.go.dev
+	if result.OverallScore >= 80 {
+		recommendations = append(recommendations, Recommendation{
+			Title:       "pkg.go.devへの公開",
+			Description: "GitHubリポジトリをPublicにしてタグをpushすると、pkg.go.devに自動的にインデックスされます（最大24時間かかる場合があります）",
+			Command:     "git push origin v0.1.0",
+			Priority:    "low",
+		})
+	}
+
+	// セキュリティスキャン
+	recommendations = append(recommendations, Recommendation{
+		Title:       "定期的なセキュリティスキャン",
+		Description: "GitHub DependabotとCodeQLを有効化して、脆弱性を自動検出しましょう",
+		Command:     "# .github/dependabot.ymlを確認",
+		Priority:    "medium",
+	})
 
 	return recommendations
 }
