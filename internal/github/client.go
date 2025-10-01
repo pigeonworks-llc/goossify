@@ -154,7 +154,7 @@ func (c *Client) setupBranchProtection(config BranchProtectionSettings) error {
 			RequireCodeOwnerReviews:      config.RequireCodeOwnerReviews,
 			RequiredApprovingReviewCount: config.RequiredReviews,
 		},
-		EnforceAdmins: true,
+		EnforceAdmins: false,
 	}
 
 	if config.RestrictPushes {
