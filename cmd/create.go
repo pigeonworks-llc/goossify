@@ -44,7 +44,7 @@ func init() {
 	createCmd.Flags().StringVarP(&createTemplate, "template", "t", "", "使用するテンプレート (cli-tool|library|web-api|service)")
 	createCmd.Flags().StringVarP(&createAuthor, "author", "a", "", "作成者名")
 	createCmd.Flags().StringVarP(&createEmail, "email", "e", "", "作成者メールアドレス")
-	createCmd.Flags().StringVarP(&createLicense, "license", "l", "MIT", "ライセンス")
+	createCmd.Flags().StringVarP(&createLicense, "license", "l", "Apache-2.0", "ライセンス")
 	createCmd.Flags().StringVarP(&createGithub, "github", "g", "", "GitHubユーザー名")
 	createCmd.Flags().BoolVarP(&createInteractive, "interactive", "i", false, "対話的モードで設定")
 
@@ -112,7 +112,7 @@ func needsInteractiveInput(config *generator.ProjectConfig) bool {
 
 func setDefaultValues(config *generator.ProjectConfig) {
 	if config.License == "" {
-		config.License = "MIT"
+		config.License = "Apache-2.0"
 	}
 	if config.GitHubUsername == "" {
 		config.GitHubUsername = "your-username"

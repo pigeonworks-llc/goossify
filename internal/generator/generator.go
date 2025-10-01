@@ -338,7 +338,7 @@ func (g *Generator) getLicenseTemplate() string {
 	case "BSD-3-Clause":
 		return templates.BSD3LicenseTemplate
 	default:
-		return templates.MITLicenseTemplate
+		return templates.Apache2LicenseTemplate
 	}
 }
 

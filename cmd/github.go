@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/pigeonworks-llc/goossify/internal/github"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -35,15 +37,6 @@ var githubSetupCmd = &cobra.Command{
 }
 
 func runGitHubSetup(cmd *cobra.Command, args []string) error {
-	// GitHub token確認
-	token := githubToken
-	if token == "" {
-		token = os.Getenv("GITHUB_TOKEN")
-	}
-	if token == "" {
-		return fmt.Errorf("GitHub token が必要です。--token フラグか GITHUB_TOKEN 環境変数を設定してください")
-	}
-
 	// Git remote URLからowner/repo取得
 	owner, repo, err := getRepositoryInfo()
 	if err != nil {
@@ -52,9 +45,28 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("🔧 GitHub リポジトリ設定を開始します: %s/%s\n", owner, repo)
 
+	// .goossify.yml から設定を読み込み
+	settings, err := loadGitHubSettings()
+	if err != nil {
+		fmt.Printf("⚠️  .goossify.yml の読み込みに失敗しました。デフォルト設定を使用します: %v\n", err)
+		settings = getDefaultSettings()
+	} else {
+		fmt.Println("✅ .goossify.yml から設定を読み込みました")
+	}
+
 	if dryRun {
-		fmt.Println("🔍 ドライランモード: 実際の設定は行いません")
+		fmt.Println("\n🔍 ドライランモード: 以下の設定を適用します（実際の変更は行いません）")
+		printSettings(settings)
 		return nil
+	}
+
+	// GitHub token確認（dry-runでない場合のみ）
+	token := githubToken
+	if token == "" {
+		token = os.Getenv("GITHUB_TOKEN")
+	}
+	if token == "" {
+		return fmt.Errorf("GitHub token が必要です。--token フラグか GITHUB_TOKEN 環境変数を設定してください")
 	}
 
 	// GitHub クライアント作成
@@ -67,8 +79,69 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("GitHub クライアント作成失敗: %w", err)
 	}
 
-	// デフォルト設定で実行
-	settings := github.RepositorySettings{
+	// 設定実行
+	fmt.Println("\n📋 設定を適用中...")
+	if err := client.SetupRepository(settings); err != nil {
+		return fmt.Errorf("リポジトリ設定失敗: %w", err)
+	}
+
+	fmt.Println("✅ GitHub リポジトリ設定が完了しました")
+	fmt.Println("\n設定内容:")
+	printSettings(settings)
+	return nil
+}
+
+// loadGitHubSettings は .goossify.yml から GitHub 設定を読み込む
+func loadGitHubSettings() (*github.RepositorySettings, error) {
+	configPath := filepath.Join(".", ".goossify.yml")
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf(".goossify.yml が見つかりません")
+	}
+
+	v := viper.New()
+	v.SetConfigFile(configPath)
+	v.SetConfigType("yaml")
+
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("設定ファイル読み込み失敗: %w", err)
+	}
+
+	// GitHub設定を読み込み
+	branchProtection := v.GetBool("integrations.github.branch_protection")
+	requiredReviews := v.GetInt("integrations.github.required_reviews")
+	statusChecks := v.GetStringSlice("integrations.github.status_checks")
+	deleteBranchOnMerge := v.GetBool("integrations.github.delete_branch_on_merge")
+
+	// デフォルト値
+	if requiredReviews == 0 {
+		requiredReviews = 1
+	}
+	if len(statusChecks) == 0 {
+		statusChecks = []string{"test", "lint"}
+	}
+
+	settings := &github.RepositorySettings{
+		Labels:              github.GetDefaultLabels(),
+		DeleteBranchOnMerge: deleteBranchOnMerge,
+	}
+
+	if branchProtection {
+		settings.BranchProtection = github.BranchProtectionSettings{
+			Branch:                  "main",
+			RequiredStatusChecks:    statusChecks,
+			RequiredReviews:         requiredReviews,
+			DismissStaleReviews:     true,
+			RequireCodeOwnerReviews: false,
+			RestrictPushes:          false,
+		}
+	}
+
+	return settings, nil
+}
+
+// getDefaultSettings はデフォルトの GitHub 設定を返す
+func getDefaultSettings() *github.RepositorySettings {
+	return &github.RepositorySettings{
 		BranchProtection: github.BranchProtectionSettings{
 			Branch:                  "main",
 			RequiredStatusChecks:    []string{"test", "lint"},
@@ -80,13 +153,21 @@ func runGitHubSetup(cmd *cobra.Command, args []string) error {
 		Labels:              github.GetDefaultLabels(),
 		DeleteBranchOnMerge: true,
 	}
+}
 
-	if err := client.SetupRepository(&settings); err != nil {
-		return fmt.Errorf("リポジトリ設定失敗: %w", err)
+// printSettings は設定内容を表示
+func printSettings(settings *github.RepositorySettings) {
+	fmt.Println("  📌 ブランチ保護:")
+	if settings.BranchProtection.Branch != "" {
+		fmt.Printf("     - ブランチ: %s\n", settings.BranchProtection.Branch)
+		fmt.Printf("     - 必須レビュー数: %d\n", settings.BranchProtection.RequiredReviews)
+		fmt.Printf("     - 必須ステータスチェック: %v\n", settings.BranchProtection.RequiredStatusChecks)
+		fmt.Printf("     - 古いレビューの却下: %v\n", settings.BranchProtection.DismissStaleReviews)
+	} else {
+		fmt.Println("     - 無効")
 	}
-
-	fmt.Println("✅ GitHub リポジトリ設定が完了しました")
-	return nil
+	fmt.Printf("  🏷️  ラベル数: %d\n", len(settings.Labels))
+	fmt.Printf("  🗑️  マージ後のブランチ削除: %v\n", settings.DeleteBranchOnMerge)
 }
 
 func getRepositoryInfo() (owner, repo string, err error) {

@@ -66,7 +66,7 @@ func init() {
 	initCmd.Flags().StringVar(&templateName, "template", "", "使用するテンプレート名")
 	initCmd.Flags().StringVarP(&author, "author", "a", "", "作成者名")
 	initCmd.Flags().StringVarP(&email, "email", "e", "", "作成者メールアドレス")
-	initCmd.Flags().StringVarP(&license, "license", "l", "MIT", "ライセンス")
+	initCmd.Flags().StringVarP(&license, "license", "l", "Apache-2.0", "ライセンス")
 	initCmd.Flags().StringVarP(&githubUsername, "github", "g", "", "GitHubユーザー名")
 }
 
@@ -134,7 +134,7 @@ func collectProjectConfig(projectName string) (*generator.ProjectConfig, error) 
 	}
 
 	if config.License == "" {
-		config.License = "MIT"
+		config.License = "Apache-2.0"
 	}
 
 	if config.GitHubUsername == "" {
@@ -267,14 +267,14 @@ func promptGitHubUsername(reader *bufio.Reader, config *generator.ProjectConfig)
 
 func promptLicense(reader *bufio.Reader, config *generator.ProjectConfig) error {
 	if config.License == "" {
-		fmt.Print("ライセンス (MIT): ")
+		fmt.Print("ライセンス (Apache-2.0): ")
 		licenseType, err := reader.ReadString('\n')
 		if err != nil {
 			return err
 		}
 		license := strings.TrimSpace(licenseType)
 		if license == "" {
-			license = "MIT"
+			license = "Apache-2.0"
 		}
 		config.License = license
 	}
