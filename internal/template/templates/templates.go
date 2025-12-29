@@ -114,7 +114,7 @@ config.json
 // go.mod template
 const GoModTemplate = `module {{.ModulePath}}
 
-go 1.21
+go 1.22
 
 require (
 	github.com/spf13/cobra v1.8.0
@@ -1071,7 +1071,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: Cache dependencies
       uses: actions/cache@v3
@@ -1111,7 +1111,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
@@ -1128,7 +1128,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: Run Gosec Security Scanner
       uses: securecodewarrior/github-action-gosec@master
@@ -1150,7 +1150,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: Build
       run: go build -v ./...
@@ -1194,7 +1194,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v5
@@ -1404,7 +1404,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: "1.21"
+        go-version: "1.22"
 
     - name: Build
       run: |

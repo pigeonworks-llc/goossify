@@ -87,6 +87,8 @@ func (a *ProjectAnalyzer) Analyze() (*AnalysisResult, error) {
 		a.analyzeQualityTools(),
 		a.analyzeDependencies(),
 		a.analyzeLicensing(),
+		a.analyzeCommunityHealth(),
+		a.analyzeAutomation(),
 	}
 
 	result.Categories = categories
@@ -578,8 +580,8 @@ func (a *ProjectAnalyzer) getBestPractices(result *AnalysisResult) []Recommendat
 		},
 		{
 			Title:       "定期的なセキュリティスキャン",
-			Description: "GitHub DependabotとCodeQLを有効化して、脆弱性を自動検出しましょう",
-			Command:     "# .github/dependabot.ymlを確認",
+			Description: "RenovateとCodeQLを有効化して、脆弱性を自動検出しましょう",
+			Command:     "# renovate.jsonとCodeQL workflowを確認",
 			Priority:    "medium",
 		},
 	}
@@ -615,4 +617,44 @@ func (a *ProjectAnalyzer) generateSummary(result *AnalysisResult) string {
 		len(result.Missing),
 		len(result.Recommendations),
 	)
+}
+
+// analyzeCommunityHealth はコミュニティ健全性を分析
+func (a *ProjectAnalyzer) analyzeCommunityHealth() CategoryResult {
+	items := []Item{
+		a.checkFile("SUPPORT.md", "サポート情報", false),
+		a.checkFile(".github/FUNDING.yml", "資金支援設定", false),
+		a.checkFile("CODEOWNERS", "コードオーナー", false),
+	}
+
+	score := a.calculateCategoryScore(items)
+	status := a.getStatusFromScore(score)
+
+	return CategoryResult{
+		Name:        "Community Health",
+		Score:       score,
+		Status:      status,
+		Description: "Community documentation and support resources",
+		Items:       items,
+	}
+}
+
+// analyzeAutomation は自動化を分析
+func (a *ProjectAnalyzer) analyzeAutomation() CategoryResult {
+	items := []Item{
+		a.checkFile("renovate.json", "依存関係自動更新(Renovate)", false),
+		a.checkFile(".github/workflows/auto-label.yml", "自動ラベリング", false),
+		a.checkFile(".github/workflows/stale.yml", "Stale管理", false),
+	}
+
+	score := a.calculateCategoryScore(items)
+	status := a.getStatusFromScore(score)
+
+	return CategoryResult{
+		Name:        "Automation",
+		Score:       score,
+		Status:      status,
+		Description: "Automated maintenance and management",
+		Items:       items,
+	}
 }

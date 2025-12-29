@@ -1,10 +1,12 @@
 package ossify
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -12,6 +14,8 @@ import (
 type Ossifier struct {
 	projectPath string
 	projectName string
+	interactive bool
+	dryRun      bool
 }
 
 // New は新しいOssifierを作成
@@ -21,6 +25,16 @@ func New(projectPath string) *Ossifier {
 		projectPath: projectPath,
 		projectName: projectName,
 	}
+}
+
+// SetInteractive は対話モードを設定
+func (o *Ossifier) SetInteractive(interactive bool) {
+	o.interactive = interactive
+}
+
+// SetDryRun はdry-runモードを設定
+func (o *Ossifier) SetDryRun(dryRun bool) {
+	o.dryRun = dryRun
 }
 
 // Execute はOSS化処理を実行
@@ -41,6 +55,10 @@ func (o *Ossifier) Execute() error {
 	}
 
 	if err := o.ensureCommunityFiles(); err != nil {
+		return err
+	}
+
+	if err := o.ensureEnhancedCommunityFiles(); err != nil {
 		return err
 	}
 
@@ -710,4 +728,162 @@ issues:
 	}
 
 	return nil
+}
+
+func (o *Ossifier) ensureEnhancedCommunityFiles() error {
+	// SUPPORT.md
+	supportPath := filepath.Join(o.projectPath, "SUPPORT.md")
+	supportContent := fmt.Sprintf(`# Support
+
+%sをお使いいただき、ありがとうございます！質問やサポートが必要な場合は、以下のリソースをご利用ください。
+
+## 📚 Documentation
+
+まず、以下のドキュメントをご確認ください：
+
+- [README](README.md) - プロジェクトの概要と基本的な使用方法
+- [Contributing Guide](CONTRIBUTING.md) - 貢献方法
+- [Examples](examples/) - 使用例
+
+## 🤔 Getting Help
+
+### 💬 GitHub Discussions
+
+質問や議論は[GitHub Discussions](https://github.com/pigeonworks-llc/%s/discussions)をご利用ください：
+
+- **Q&A**: 使い方に関する質問
+- **Ideas**: 新機能のアイデア
+- **Show and Tell**: あなたの作品を共有
+- **General**: その他の議論
+
+### 🐛 Bug Reports
+
+バグを発見した場合は[Issues](https://github.com/pigeonworks-llc/%s/issues)で報告してください：
+
+1. Bug Report Templateを使用
+2. 再現手順と環境情報を含める
+3. エラーメッセージやログを添付
+
+### ✨ Feature Requests
+
+新機能の提案は[Issues](https://github.com/pigeonworks-llc/%s/issues)で行ってください：
+
+1. Feature Request Templateを使用
+2. 具体的な使用例を含める
+3. 既存の代替案との比較を説明
+
+## 📧 Direct Contact
+
+緊急の問題やプライベートな質問がある場合：
+
+- **Email**: support@pigeonworks.llc
+- **Response Time**: 通常48時間以内
+
+## 💡 Self-Help Resources
+
+### 🔧 Troubleshooting
+
+よくある問題と解決方法については、ドキュメントをご覧ください。
+
+### 📖 Learning Resources
+
+- [Go Documentation](https://golang.org/doc/)
+- [Go by Example](https://gobyexample.com/)
+- [Effective Go](https://golang.org/doc/effective_go.html)
+
+## 🙏 Thank You
+
+%sコミュニティの一員になっていただき、ありがとうございます！
+
+あなたの質問、フィードバック、貢献がプロジェクトの改善に役立ちます。🚀
+
+---
+
+**注意**: セキュリティに関する問題は[Security Policy](SECURITY.md)に従って報告してください。`, o.projectName, o.projectName, o.projectName, o.projectName, o.projectName)
+
+	if _, err := os.Stat(supportPath); err != nil {
+		fmt.Println("🆘 SUPPORT.md を生成中...")
+		if err := o.writeFileInteractive(supportPath, supportContent, "SUPPORT.md - サポート情報"); err != nil {
+			return fmt.Errorf("SUPPORT.md作成失敗: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// writeFileInteractive はファイルを対話的に書き込む
+func (o *Ossifier) writeFileInteractive(filePath string, content string, description string) error {
+	// 既存ファイル確認
+	exists := false
+	if _, err := os.ReadFile(filePath); err == nil {
+		exists = true
+	}
+
+	// 対話モードまたはdry-runモードの処理
+	if o.interactive || o.dryRun {
+		fmt.Printf("\n📄 %s\n", description)
+		fmt.Printf("   ファイル: %s\n", filePath)
+
+		if exists {
+			fmt.Println("   状態: 既存ファイル（変更なし）")
+			if o.interactive {
+				fmt.Print("\n   スキップしますか? [Y/n]: ")
+				if !o.askConfirmation(true) {
+					return nil // ユーザーがスキップを選択
+				}
+			}
+			return nil // 既存ファイルは変更しない
+		} else {
+			fmt.Println("   状態: 新規作成")
+			fmt.Println("\n--- 内容プレビュー ---")
+			lines := strings.Split(content, "\n")
+			previewLines := 15
+			for i, line := range lines {
+				if i >= previewLines {
+					fmt.Printf("... (%d行省略)\n", len(lines)-previewLines)
+					break
+				}
+				fmt.Printf("   %s\n", line)
+			}
+			fmt.Println("--- プレビュー終了 ---")
+
+			if o.dryRun {
+				fmt.Println("   [DRY-RUN] 実際には作成しません")
+				return nil
+			}
+
+			if o.interactive {
+				fmt.Print("\n   このファイルを作成しますか? [Y/n]: ")
+				if !o.askConfirmation(true) {
+					fmt.Println("   ⏭️  スキップしました")
+					return nil
+				}
+			}
+		}
+	}
+
+	// ファイル書き込み
+	if !o.dryRun {
+		if err := os.WriteFile(filePath, []byte(content), 0600); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// askConfirmation はユーザーに確認を求める
+func (o *Ossifier) askConfirmation(defaultYes bool) bool {
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return defaultYes
+	}
+
+	response = strings.ToLower(strings.TrimSpace(response))
+	if response == "" {
+		return defaultYes
+	}
+
+	return response == "y" || response == "yes"
 }

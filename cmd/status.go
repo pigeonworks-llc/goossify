@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pigeonworks-llc/goossify/internal/analyzer"
+	"github.com/pigeonworks-llc/goossify/internal/ossify"
 	"github.com/spf13/cobra"
 )
 
@@ -181,12 +182,24 @@ func outputHuman(result *analyzer.AnalysisResult, githubCheck interface{}) error
 }
 
 func runAutoFix(result *analyzer.AnalysisResult) error {
-	// Simple implementation: execute ossify command
-	fmt.Println("Executing ossify command to generate missing files...")
+	fmt.Println("🔧 Running automatic fixes...")
 
-	// TODO: Call ossify functionality directly
-	// Currently just displaying messages
-	fmt.Println("✅ Auto-fix completed")
+	// Get current working directory
+	projectPath, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	// Create and execute Ossifier
+	ossifier := ossify.New(projectPath)
+	ossifier.SetInteractive(false)
+	ossifier.SetDryRun(false)
+
+	if err := ossifier.Execute(); err != nil {
+		return fmt.Errorf("auto-fix failed: %w", err)
+	}
+
+	fmt.Println("\n✅ Auto-fix completed!")
 	fmt.Println("Run 'goossify status' again to verify improvements")
 
 	return nil
