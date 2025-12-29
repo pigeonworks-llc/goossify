@@ -13,4 +13,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+	if cmd.ExitCode != 0 {
+		os.Exit(cmd.ExitCode)
+	}
 }

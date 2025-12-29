@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	cfgFile string
-	verbose bool
+	cfgFile  string
+	verbose  bool
+	ExitCode int // Global exit code set by commands
 )
 
 // rootCmd represents the base command when called without any subcommands.

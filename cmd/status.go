@@ -16,6 +16,7 @@ var (
 	statusFix         bool
 	statusGitHub      bool
 	statusGitHubToken string
+	statusThreshold   int
 )
 
 // statusCmd represents the status command
@@ -44,6 +45,7 @@ func init() {
 	statusCmd.Flags().BoolVar(&statusFix, "fix", false, "Execute automatic fixes for missing items")
 	statusCmd.Flags().BoolVar(&statusGitHub, "github", false, "Include GitHub settings check (requires TOKEN)")
 	statusCmd.Flags().StringVar(&statusGitHubToken, "github-token", "", "GitHub Personal Access Token")
+	statusCmd.Flags().IntVar(&statusThreshold, "threshold", 0, "Minimum score threshold (exit 3 if below)")
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
@@ -92,12 +94,29 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	// Output results
+	var outputErr error
 	switch statusFormat {
 	case "json":
-		return outputJSON(result, githubCheck)
+		outputErr = outputJSON(result, githubCheck)
 	default:
-		return outputHuman(result, githubCheck)
+		outputErr = outputHuman(result, githubCheck)
 	}
+
+	if outputErr != nil {
+		return outputErr
+	}
+
+	// Set exit code based on threshold or score
+	if statusThreshold > 0 && result.OverallScore < statusThreshold {
+		ExitCode = 3 // ValidationFail
+		if statusFormat != "json" {
+			fmt.Printf("\n❌ Score %d is below threshold %d\n", result.OverallScore, statusThreshold)
+		}
+	} else if result.OverallScore < 60 {
+		ExitCode = 2 // Warning
+	}
+
+	return nil
 }
 
 func outputJSON(result *analyzer.AnalysisResult, githubCheck interface{}) error {
