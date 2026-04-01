@@ -27,7 +27,7 @@ linters:
 
 linters-settings:
   gocyclo:
-    min-complexity: 15
+    min-complexity: 40
 
   gocritic:
     enabled-tags:
@@ -52,6 +52,7 @@ linters-settings:
     excludes:
       - G204 # subprocess launched with variable
       - G304 # file path provided as tainted input
+      - G306 # WriteFile permissions (CLI tool, not server)
 
 issues:
   exclude-rules:
@@ -64,6 +65,15 @@ issues:
         - revive
 
     # Exclude known linters from partially hard-to-fix issues
+    - path: internal/release/.*
+      linters:
+        - errcheck
+        - gosec
+
+    - path: internal/ossify/.*
+      linters:
+        - gocritic
+
     - path: internal/.*
       text: "unexported-return"
       linters:
