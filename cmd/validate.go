@@ -165,14 +165,14 @@ func outputValidationText(result *analyzer.AnalysisResult, openSSFLevel string) 
 // outputValidationJSON はJSON形式で出力
 func outputValidationJSON(result *analyzer.AnalysisResult, openSSFLevel string) error {
 	output := map[string]interface{}{
-		"overall_score":  result.OverallScore,
-		"openssf_level":  openSSFLevel,
-		"project_name":   result.ProjectName,
-		"project_type":   result.ProjectType,
-		"categories":     result.Categories,
-		"missing":        result.Missing,
+		"overall_score":   result.OverallScore,
+		"openssf_level":   openSSFLevel,
+		"project_name":    result.ProjectName,
+		"project_type":    result.ProjectType,
+		"categories":      result.Categories,
+		"missing":         result.Missing,
 		"recommendations": result.Recommendations,
-		"summary":        result.Summary,
+		"summary":         result.Summary,
 	}
 
 	encoder := json.NewEncoder(os.Stdout)

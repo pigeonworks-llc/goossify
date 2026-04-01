@@ -69,10 +69,18 @@ issues:
       linters:
         - errcheck
         - gosec
+        - gocritic
+        - unparam
 
     - path: internal/ossify/.*
       linters:
         - gocritic
+
+    - path: cmd/
+      linters:
+        - errcheck
+        - gocritic
+        - unparam
 
     - path: internal/.*
       text: "unexported-return"

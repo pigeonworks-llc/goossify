@@ -18,20 +18,20 @@ var secretPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`(?i)password\s*[:=]\s*["'][^"']{8,}["']`),           // Hardcoded password
 	regexp.MustCompile(`(?i)secret\s*[:=]\s*["'][^"']{8,}["']`),             // Hardcoded secret
 	regexp.MustCompile(`(?i)api[_-]?key\s*[:=]\s*["'][a-zA-Z0-9]{16,}["']`), // API key assignment
-	regexp.MustCompile(`-----BEGIN (RSA |EC )?PRIVATE KEY-----`),            // Private key
+	regexp.MustCompile(`-{5}BEGIN (RSA |EC )?PRIVATE KEY-{5}`),              // Private key
 }
 
 // Internal reference patterns to detect in source code.
 var internalRefPatterns = []*regexp.Regexp{
-	regexp.MustCompile(`\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b`),                // 10.x.x.x
-	regexp.MustCompile(`\b172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}\b`), // 172.16-31.x.x
-	regexp.MustCompile(`\b192\.168\.\d{1,3}\.\d{1,3}\b`),                   // 192.168.x.x
-	regexp.MustCompile(`\b127\.0\.0\.1\b`),                                 // localhost IPv4
-	regexp.MustCompile(`(?i)\.localhost\b`),                                // *.localhost
-	regexp.MustCompile(`(?i)\.internal\b`),                                 // *.internal
-	regexp.MustCompile(`(?i)\.local\b`),                                    // *.local
-	regexp.MustCompile(`(?i)\.corp\b`),                                     // *.corp
-	regexp.MustCompile(`(?i)forgejo\.localhost`),                           // Forgejo local
+	regexp.MustCompile(`\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b`),             // 10.x.x.x
+	regexp.MustCompile(`\b172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}\b`), // 172.16-31.x.x
+	regexp.MustCompile(`\b192\.168\.\d{1,3}\.\d{1,3}\b`),                // 192.168.x.x
+	regexp.MustCompile(`\b127\.0\.0\.1\b`),                              // localhost IPv4
+	regexp.MustCompile(`(?i)\.localhost\b`),                             // *.localhost
+	regexp.MustCompile(`(?i)\.internal\b`),                              // *.internal
+	regexp.MustCompile(`(?i)\.local\b`),                                 // *.local
+	regexp.MustCompile(`(?i)\.corp\b`),                                  // *.corp
+	regexp.MustCompile(`(?i)forgejo\.localhost`),                        // Forgejo local
 }
 
 type finding struct {
