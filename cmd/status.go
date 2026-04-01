@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pigeonworks-llc/goossify/internal/analyzer"
+	"github.com/pigeonworks-llc/goossify/internal/ossify"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,7 @@ var (
 	statusFix         bool
 	statusGitHub      bool
 	statusGitHubToken string
+	statusThreshold   int
 )
 
 // statusCmd represents the status command
@@ -43,6 +45,7 @@ func init() {
 	statusCmd.Flags().BoolVar(&statusFix, "fix", false, "Execute automatic fixes for missing items")
 	statusCmd.Flags().BoolVar(&statusGitHub, "github", false, "Include GitHub settings check (requires TOKEN)")
 	statusCmd.Flags().StringVar(&statusGitHubToken, "github-token", "", "GitHub Personal Access Token")
+	statusCmd.Flags().IntVar(&statusThreshold, "threshold", 0, "Minimum score threshold (exit 3 if below)")
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
@@ -91,12 +94,29 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	// Output results
+	var outputErr error
 	switch statusFormat {
 	case "json":
-		return outputJSON(result, githubCheck)
+		outputErr = outputJSON(result, githubCheck)
 	default:
-		return outputHuman(result, githubCheck)
+		outputErr = outputHuman(result, githubCheck)
 	}
+
+	if outputErr != nil {
+		return outputErr
+	}
+
+	// Set exit code based on threshold or score
+	if statusThreshold > 0 && result.OverallScore < statusThreshold {
+		ExitCode = 3 // ValidationFail
+		if statusFormat != "json" {
+			fmt.Printf("\n❌ Score %d is below threshold %d\n", result.OverallScore, statusThreshold)
+		}
+	} else if result.OverallScore < 60 {
+		ExitCode = 2 // Warning
+	}
+
+	return nil
 }
 
 func outputJSON(result *analyzer.AnalysisResult, githubCheck interface{}) error {
@@ -181,12 +201,24 @@ func outputHuman(result *analyzer.AnalysisResult, githubCheck interface{}) error
 }
 
 func runAutoFix(result *analyzer.AnalysisResult) error {
-	// Simple implementation: execute ossify command
-	fmt.Println("Executing ossify command to generate missing files...")
+	fmt.Println("🔧 Running automatic fixes...")
 
-	// TODO: Call ossify functionality directly
-	// Currently just displaying messages
-	fmt.Println("✅ Auto-fix completed")
+	// Get current working directory
+	projectPath, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	// Create and execute Ossifier
+	ossifier := ossify.New(projectPath)
+	ossifier.SetInteractive(false)
+	ossifier.SetDryRun(false)
+
+	if err := ossifier.Execute(); err != nil {
+		return fmt.Errorf("auto-fix failed: %w", err)
+	}
+
+	fmt.Println("\n✅ Auto-fix completed!")
 	fmt.Println("Run 'goossify status' again to verify improvements")
 
 	return nil

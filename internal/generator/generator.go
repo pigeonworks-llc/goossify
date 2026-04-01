@@ -115,7 +115,7 @@ func (g *Generator) createDirectoryStructure() error {
 	}
 
 	for _, dir := range dirs {
-		if err := os.MkdirAll(g.absPath(dir), 0o755); err != nil {
+		if err := os.MkdirAll(g.absPath(dir), 0o750); err != nil {
 			return fmt.Errorf("ディレクトリ %s 作成失敗: %w", dir, err)
 		}
 	}
@@ -167,7 +167,7 @@ func (g *Generator) generateCLIFiles() error {
 	}
 
 	for filename, templateContent := range cliFiles {
-		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o750); err != nil {
 			return err
 		}
 		if err := g.writeFileFromTemplate(filename, templateContent); err != nil {
@@ -187,7 +187,7 @@ func (g *Generator) generateLibraryFiles() error {
 	}
 
 	for filename, templateContent := range libraryFiles {
-		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o750); err != nil {
 			return err
 		}
 		if err := g.writeFileFromTemplate(filename, templateContent); err != nil {
@@ -208,7 +208,7 @@ func (g *Generator) generateWebAPIFiles() error {
 	}
 
 	for filename, templateContent := range webAPIFiles {
-		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o750); err != nil {
 			return err
 		}
 		if err := g.writeFileFromTemplate(filename, templateContent); err != nil {
@@ -229,7 +229,7 @@ func (g *Generator) generateServiceFiles() error {
 	}
 
 	for filename, templateContent := range serviceFiles {
-		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(g.absPath(filename)), 0o750); err != nil {
 			return err
 		}
 		if err := g.writeFileFromTemplate(filename, templateContent); err != nil {
@@ -312,7 +312,7 @@ func (g *Generator) writeFileFromTemplate(filename, templateContent string) erro
 	}
 
 	fullPath := g.absPath(filename)
-	if err := os.MkdirAll(filepath.Dir(fullPath), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(fullPath), 0o750); err != nil {
 		return fmt.Errorf("ディレクトリ作成失敗: %w", err)
 	}
 

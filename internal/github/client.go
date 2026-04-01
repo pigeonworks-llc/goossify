@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-github/v57/github"
+	"github.com/google/go-github/v68/github"
 	"golang.org/x/oauth2"
 )
 
@@ -147,7 +147,7 @@ func (c *Client) setupBranchProtection(config BranchProtectionSettings) error {
 	protection := &github.ProtectionRequest{
 		RequiredStatusChecks: &github.RequiredStatusChecks{
 			Strict:   true,
-			Contexts: config.RequiredStatusChecks,
+			Contexts: &config.RequiredStatusChecks,
 		},
 		RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
 			DismissStaleReviews:          config.DismissStaleReviews,

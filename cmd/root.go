@@ -11,6 +11,8 @@ import (
 var (
 	cfgFile string
 	verbose bool
+	// ExitCode is the process exit code set by subcommands.
+	ExitCode int
 )
 
 // rootCmd represents the base command when called without any subcommands.

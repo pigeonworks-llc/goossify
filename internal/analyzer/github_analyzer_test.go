@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/google/go-github/v57/github"
+	"github.com/google/go-github/v68/github"
 )
 
 // MockGitHubClient は GitHub API クライアントのモック
@@ -42,7 +42,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 		{
 			name: "ブランチ保護が設定されている場合",
 			repository: &github.Repository{
-				DefaultBranch: github.String("main"),
+				DefaultBranch: github.Ptr("main"),
 			},
 			protection: &github.Protection{
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcement{
@@ -50,7 +50,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 					RequireCodeOwnerReviews:      true,
 				},
 				RequiredStatusChecks: &github.RequiredStatusChecks{
-					Contexts: []string{"ci", "tests"},
+					Contexts: &[]string{"ci", "tests"},
 				},
 				EnforceAdmins: &github.AdminEnforcement{
 					Enabled: true,
@@ -63,7 +63,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 		{
 			name: "ブランチ保護が設定されていない場合",
 			repository: &github.Repository{
-				DefaultBranch: github.String("main"),
+				DefaultBranch: github.Ptr("main"),
 			},
 			protection:     nil,
 			protectionErr:  nil, // 404エラーのシミュレーション

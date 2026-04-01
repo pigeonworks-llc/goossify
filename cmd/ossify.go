@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	interactiveMode bool
+	dryRunMode      bool
+)
+
 var ossifyCmd = &cobra.Command{
 	Use:   "ossify [path]",
 	Short: "既存プロジェクトをOSS対応に変換",
@@ -47,14 +52,23 @@ func runOssify(cmd *cobra.Command, args []string) error {
 
 	// Ossifierを初期化して実行
 	ossifier := ossify.New(absPath)
+	ossifier.SetInteractive(interactiveMode)
+	ossifier.SetDryRun(dryRunMode)
+
 	if err := ossifier.Execute(); err != nil {
 		return fmt.Errorf("OSS化処理中にエラーが発生しました: %w", err)
 	}
 
-	fmt.Println("✅ OSS化が完了しました！")
+	if dryRunMode {
+		fmt.Println("✅ Dry-runモード: 実際のファイル変更は行われませんでした")
+	} else {
+		fmt.Println("✅ OSS化が完了しました！")
+	}
 	return nil
 }
 
 func init() {
 	rootCmd.AddCommand(ossifyCmd)
+	ossifyCmd.Flags().BoolVarP(&interactiveMode, "interactive", "i", false, "対話的に確認しながら適用")
+	ossifyCmd.Flags().BoolVar(&dryRunMode, "dry-run", false, "実際には適用せず、変更内容のみ表示")
 }

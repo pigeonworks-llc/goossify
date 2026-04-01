@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/google/go-github/v57/github"
+	"github.com/google/go-github/v68/github"
 	"golang.org/x/oauth2"
 )
 
@@ -163,7 +163,10 @@ func (g *GitHubAnalyzer) AnalyzeGitHubSettings() (*GitHubCheck, error) {
 		// ステータスチェック設定
 		if protection.GetRequiredStatusChecks() != nil {
 			checks := protection.GetRequiredStatusChecks()
-			checkCount := len(checks.Contexts)
+			checkCount := 0
+			if checks.Contexts != nil {
+				checkCount = len(*checks.Contexts)
+			}
 			if checkCount > 0 {
 				result.StatusChecks = Item{
 					Name:        fmt.Sprintf("ステータスチェック (%d個)", checkCount),
