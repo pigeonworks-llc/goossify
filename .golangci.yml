@@ -1,96 +1,95 @@
-# golangci-lint configuration
-# https://golangci-lint.run/usage/configuration/
+version: "2"
 
 run:
   timeout: 5m
   modules-download-mode: readonly
 
-linters:
+formatters:
   enable:
-    - errcheck      # checking for unchecked errors
-    - gosimple      # simplify code
-    - govet         # reports suspicious constructs
-    - ineffassign   # detects unused assignments
-    - staticcheck   # go vet on steroids
-    - typecheck     # type-checks Go code
-    - unused        # checks for unused constants, variables, functions and types
-    - goimports     # fix imports and format code
-    - misspell      # finds misspelled English words in comments
-    - gocritic      # provides diagnostics that check for bugs, performance and style issues
-    - revive        # fast, configurable, extensible, flexible replacement for golint
-    - gosec         # inspects source code for security problems
-    - unconvert     # remove unnecessary type conversions
-    - unparam       # reports unused function parameters
-    - gocyclo       # computes cyclomatic complexities
-    - gofmt         # checks whether code was gofmt-ed
-    - whitespace    # tool for detection of leading and trailing whitespace
+    - goimports
+    - gofmt
 
-linters-settings:
-  gocyclo:
-    min-complexity: 40
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - misspell
+    - gocritic
+    - revive
+    - gosec
+    - unconvert
+    - unparam
+    - gocyclo
+    - whitespace
 
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-      - wrapperFunc
+  settings:
+    gocyclo:
+      min-complexity: 40
 
-  revive:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+      disabled-checks:
+        - dupImport
+        - ifElseChain
+        - octalLiteral
+        - whyNoLint
+        - wrapperFunc
+
+    revive:
+      rules:
+        - name: exported
+          arguments: [checkPrivateReceivers]
+
+    gosec:
+      excludes:
+        - G204
+        - G304
+        - G306
+
+  exclusions:
     rules:
-      - name: exported
-        arguments: [checkPrivateReceivers]
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - gosec
+          - errcheck
+          - revive
 
-  gosec:
-    excludes:
-      - G204 # subprocess launched with variable
-      - G304 # file path provided as tainted input
-      - G306 # WriteFile permissions (CLI tool, not server)
+      - path: internal/release/.*
+        linters:
+          - errcheck
+          - gosec
+          - gocritic
+          - unparam
 
-issues:
-  exclude-rules:
-    # Exclude some linters from running on tests files
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - gosec
-        - errcheck
-        - revive
+      - path: internal/ossify/.*
+        linters:
+          - gocritic
 
-    # Exclude known linters from partially hard-to-fix issues
-    - path: internal/release/.*
-      linters:
-        - errcheck
-        - gosec
-        - gocritic
-        - unparam
+      - path: cmd/
+        linters:
+          - errcheck
+          - gocritic
+          - unparam
 
-    - path: internal/ossify/.*
-      linters:
-        - gocritic
+      - path: internal/.*
+        text: "unexported-return"
+        linters:
+          - revive
 
-    - path: cmd/
-      linters:
-        - errcheck
-        - gocritic
-        - unparam
+      - text: 'shadow: declaration of "err"'
+        linters:
+          - govet
 
-    - path: internal/.*
-      text: "unexported-return"
-      linters:
-        - revive
-
-    # Exclude shadow checking on err variables in some cases
-    - text: "shadow: declaration of \"err\""
-      linters:
-        - govet
-
-  max-issues-per-linter: 50
-  max-same-issues: 3
+    max-issues-per-linter: 50
+    max-same-issues: 3
