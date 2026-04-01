@@ -42,7 +42,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 		{
 			name: "ブランチ保護が設定されている場合",
 			repository: &github.Repository{
-				DefaultBranch: github.String("main"),
+				DefaultBranch: github.Ptr("main"),
 			},
 			protection: &github.Protection{
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcement{
@@ -63,7 +63,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 		{
 			name: "ブランチ保護が設定されていない場合",
 			repository: &github.Repository{
-				DefaultBranch: github.String("main"),
+				DefaultBranch: github.Ptr("main"),
 			},
 			protection:     nil,
 			protectionErr:  nil, // 404エラーのシミュレーション

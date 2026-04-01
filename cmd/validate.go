@@ -105,11 +105,14 @@ func outputValidationText(result *analyzer.AnalysisResult, openSSFLevel string) 
 		// 詳細項目（オプション）
 		if verbose {
 			for _, item := range category.Items {
-				itemIcon := "✅"
-				if item.Status == "missing" {
+				var itemIcon string
+				switch item.Status {
+				case "missing":
 					itemIcon = "❌"
-				} else if item.Status == "warning" {
+				case "warning":
 					itemIcon = "⚠️"
+				default:
+					itemIcon = "✅"
 				}
 				fmt.Printf("    %s %s\n", itemIcon, item.Name)
 			}

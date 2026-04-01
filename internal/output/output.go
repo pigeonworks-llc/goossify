@@ -10,6 +10,7 @@ import (
 // Format represents the output format type.
 type Format string
 
+// FormatHuman and FormatJSON define supported output formats.
 const (
 	FormatHuman Format = "human"
 	FormatJSON  Format = "json"

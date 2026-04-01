@@ -198,11 +198,14 @@ func runReady(cmd *cobra.Command, args []string) error {
 	if !isJSON {
 		fmt.Println("\n📋 Pre-publication Checklist:")
 		for i, item := range checklist {
-			statusIcon := "⬜"
-			if item.Status == "done" {
+			var statusIcon string
+			switch item.Status {
+			case "done":
 				statusIcon = "✅"
-			} else if item.Status == "warning" {
+			case "warning":
 				statusIcon = "⚠️"
+			default:
+				statusIcon = "⬜"
 			}
 			fmt.Printf("  %s %d. %s\n", statusIcon, i+1, item.Title)
 			if item.Description != "" {

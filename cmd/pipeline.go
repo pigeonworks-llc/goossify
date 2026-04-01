@@ -180,11 +180,12 @@ func runPipeline(cmd *cobra.Command, args []string) error {
 
 	// Summary
 	fmt.Println("\n" + "─────────────────────────────────────")
-	if result.ExitCode == exitcode.Success {
+	switch result.ExitCode {
+	case exitcode.Success:
 		fmt.Println("✅ Pipeline completed successfully!")
-	} else if result.ExitCode == exitcode.ValidationFail {
+	case exitcode.ValidationFail:
 		fmt.Println("⚠️  Pipeline completed with validation failures")
-	} else {
+	default:
 		fmt.Println("❌ Pipeline failed")
 	}
 
