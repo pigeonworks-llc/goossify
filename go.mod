@@ -1,6 +1,6 @@
 module github.com/pigeonworks-llc/goossify
 
-go 1.21
+go 1.26
 
 require (
 	github.com/google/go-github/v68 v68.0.0
