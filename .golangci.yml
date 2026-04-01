@@ -74,12 +74,22 @@ linters:
       - path: internal/ossify/.*
         linters:
           - gocritic
+          - gosec
+
+      - path: internal/generator/.*
+        linters:
+          - errcheck
+
+      - path: internal/template/.*
+        linters:
+          - revive
 
       - path: cmd/
         linters:
           - errcheck
           - gocritic
           - unparam
+          - gosec
 
       - path: internal/.*
         text: "unexported-return"
