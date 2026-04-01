@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/google/go-github/v57/github"
+	"github.com/google/go-github/v68/github"
 )
 
 // MockGitHubClient は GitHub API クライアントのモック
@@ -50,7 +50,7 @@ func TestGitHubAnalyzer(t *testing.T) {
 					RequireCodeOwnerReviews:      true,
 				},
 				RequiredStatusChecks: &github.RequiredStatusChecks{
-					Contexts: []string{"ci", "tests"},
+					Contexts: &[]string{"ci", "tests"},
 				},
 				EnforceAdmins: &github.AdminEnforcement{
 					Enabled: true,
