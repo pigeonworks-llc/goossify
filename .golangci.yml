@@ -90,5 +90,6 @@ linters:
         linters:
           - govet
 
-    max-issues-per-linter: 50
-    max-same-issues: 3
+output:
+  max-issues-per-linter: 50
+  max-same-issues: 3
