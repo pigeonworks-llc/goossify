@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -12,9 +13,10 @@ import (
 )
 
 var (
-	readyDryRun bool
-	readyToken  string
-	readyFormat string
+	readyDryRun    bool
+	readyToken     string
+	readyFormat    string
+	readySkipTests bool
 )
 
 // ReadyResult represents the result of ready check for JSON output.
@@ -26,6 +28,7 @@ type ReadyResult struct {
 	Checklist      []ChecklistItem `json:"checklist"`
 	SensitiveFiles []string        `json:"sensitive_files,omitempty"`
 	LicenseInfo    *LicenseInfo    `json:"license_info,omitempty"`
+	TestOutput     string          `json:"test_output,omitempty"`
 	Errors         []string        `json:"errors,omitempty"`
 	Warnings       []string        `json:"warnings,omitempty"`
 	ExitCode       int             `json:"exit_code"`
@@ -60,6 +63,7 @@ func init() {
 	readyCmd.Flags().BoolVar(&readyDryRun, "dry-run", true, "詳細チェック実行（常にチェックのみ）")
 	readyCmd.Flags().StringVar(&readyToken, "github-token", "", "GitHub Personal Access Token")
 	readyCmd.Flags().StringVarP(&readyFormat, "format", "f", "human", "Output format (human, json)")
+	readyCmd.Flags().BoolVar(&readySkipTests, "skip-tests", false, "Skip go test execution")
 }
 
 func runReady(cmd *cobra.Command, args []string) error {
@@ -116,7 +120,28 @@ func runReady(cmd *cobra.Command, args []string) error {
 		fmt.Printf("✅ OSS Health Score: %d/100\n", result.OverallScore)
 	}
 
-	// 2. Sensitive information check
+	// 2. Go test execution
+	if !readySkipTests {
+		if !isJSON {
+			fmt.Println("\n🧪 Running Tests...")
+		}
+		testOutput, testErr := runGoTests(targetPath)
+		readyResult.TestOutput = testOutput
+		if testErr != nil {
+			readyResult.Ready = false
+			readyResult.Errors = append(readyResult.Errors, fmt.Sprintf("tests failed: %v", testErr))
+			readyResult.ExitCode = 3
+			if !isJSON {
+				fmt.Printf("❌ Tests failed:\n%s\n", testOutput)
+			}
+		} else if !isJSON {
+			fmt.Println("✅ All tests passed")
+		}
+	} else if !isJSON {
+		fmt.Println("\n🧪 Tests: skipped (--skip-tests)")
+	}
+
+	// 3. Sensitive information check
 	if !isJSON {
 		fmt.Println("\n🔍 Sensitive Information Check...")
 	}
@@ -514,4 +539,21 @@ func detectLicenseType(content string) string {
 	}
 
 	return ""
+}
+
+// runGoTests runs `go test ./...` in the target directory and returns
+// combined output and any error.
+func runGoTests(targetPath string) (string, error) {
+	absPath, err := filepath.Abs(targetPath)
+	if err != nil {
+		return "", fmt.Errorf("resolve path %s: %w", targetPath, err)
+	}
+
+	cmd := exec.Command("go", "test", "./...")
+	cmd.Dir = absPath
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(out), fmt.Errorf("go test failed: %w", err)
+	}
+	return string(out), nil
 }

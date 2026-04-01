@@ -89,6 +89,8 @@ func (a *ProjectAnalyzer) Analyze() (*AnalysisResult, error) {
 		a.analyzeLicensing(),
 		a.analyzeCommunityHealth(),
 		a.analyzeAutomation(),
+		a.analyzeCredentialScanning(),
+		a.analyzeInternalReferences(),
 	}
 
 	result.Categories = categories
