@@ -71,8 +71,8 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	fmt.Printf("🔍 Starting project analysis: %s\n\n", absPath)
 
 	// Execute project analysis
-	analyzer := analyzer.New(absPath)
-	result, err := analyzer.Analyze()
+	projectAnalyzer := analyzer.New(absPath)
+	result, err := projectAnalyzer.Analyze()
 	if err != nil {
 		return fmt.Errorf("error occurred during analysis: %w", err)
 	}
@@ -191,7 +191,7 @@ func outputHuman(result *analyzer.AnalysisResult, githubCheck interface{}) error
 	// Auto-fix suggestions
 	if statusFix {
 		fmt.Printf("\n🔧 Running automatic fixes...\n")
-		return runAutoFix(result)
+		return runAutoFix()
 	} else if len(result.Missing) > 0 {
 		fmt.Printf("\n💡 Many issues can be auto-fixed with 'goossify ossify .'\n")
 		fmt.Printf("   To run auto-fixes: goossify status --fix\n")
@@ -200,7 +200,7 @@ func outputHuman(result *analyzer.AnalysisResult, githubCheck interface{}) error
 	return nil
 }
 
-func runAutoFix(result *analyzer.AnalysisResult) error {
+func runAutoFix() error {
 	fmt.Println("🔧 Running automatic fixes...")
 
 	// Get current working directory

@@ -190,10 +190,8 @@ func executeOnPackage(command, path string, silent bool) PackageResult {
 			if !silent {
 				fmt.Printf("  ❌ %s: %v\n", path, err)
 			}
-		} else {
-			if !silent {
-				fmt.Printf("  ✅ %s: Ossified\n", path)
-			}
+		} else if !silent {
+			fmt.Printf("  ✅ %s: Ossified\n", path)
 		}
 
 	case "pipeline":

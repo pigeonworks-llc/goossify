@@ -118,7 +118,7 @@ func (m *Manager) checkPrerequisites() error {
 		return fmt.Errorf("failed to check git status: %w", err)
 	}
 
-	if len(strings.TrimSpace(string(output))) > 0 && !m.config.DryRun {
+	if strings.TrimSpace(string(output)) != "" && !m.config.DryRun {
 		return fmt.Errorf("there are uncommitted changes. Please commit or stash them first")
 	}
 
@@ -226,7 +226,7 @@ func (m *Manager) updateChangelog() error {
 		return nil
 	}
 
-	if err := os.WriteFile(changelogPath, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Clean(changelogPath), []byte(newContent), 0644); err != nil {
 		return fmt.Errorf("failed to write CHANGELOG.md: %w", err)
 	}
 
@@ -258,7 +258,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 		return nil
 	}
 
-	return os.WriteFile(changelogPath, []byte(content), 0644)
+	return os.WriteFile(filepath.Clean(changelogPath), []byte(content), 0644)
 }
 
 func (m *Manager) getCommitsSinceLastTag() ([]string, error) {
@@ -321,9 +321,9 @@ func (m *Manager) generateReleaseSection(commits []string) string {
 	}
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("## [%s] - %s\n\n",
+	fmt.Fprintf(&sb, "## [%s] - %s\n\n",
 		strings.TrimPrefix(m.config.Version, "v"),
-		time.Now().Format("2006-01-02")))
+		time.Now().Format("2006-01-02"))
 
 	if len(features) > 0 {
 		sb.WriteString("### Added\n")
@@ -355,7 +355,7 @@ func (m *Manager) generateReleaseSection(commits []string) string {
 	return sb.String()
 }
 
-func insertReleaseSection(content, version, releaseSection string) string {
+func insertReleaseSection(content, _, releaseSection string) string {
 	// Find ## [Unreleased] and insert after it
 	unreleasedPattern := regexp.MustCompile(`(?m)^## \[Unreleased\].*\n`)
 	loc := unreleasedPattern.FindStringIndex(content)
@@ -370,7 +370,7 @@ func insertReleaseSection(content, version, releaseSection string) string {
 		nextLoc := nextSectionPattern.FindStringIndex(remaining)
 
 		if nextLoc != nil {
-			insertPos = insertPos + nextLoc[0]
+			insertPos += nextLoc[0]
 		}
 
 		return content[:insertPos] + "\n" + releaseSection + content[insertPos:]
@@ -440,7 +440,7 @@ func (m *Manager) updateGoVersionFile(path, version string) error {
 		return nil
 	}
 
-	return os.WriteFile(path, []byte(newContent), 0644)
+	return os.WriteFile(filepath.Clean(path), []byte(newContent), 0644)
 }
 
 func (m *Manager) createGitTag() error {
@@ -507,14 +507,14 @@ func bumpVersion(version, bumpType string) string {
 	}
 
 	var major, minor, patch int
-	fmt.Sscanf(parts[0], "%d", &major)
-	fmt.Sscanf(parts[1], "%d", &minor)
+	_, _ = fmt.Sscanf(parts[0], "%d", &major)
+	_, _ = fmt.Sscanf(parts[1], "%d", &minor)
 	// Handle pre-release suffix
 	patchStr := parts[2]
 	if idx := strings.Index(patchStr, "-"); idx != -1 {
 		patchStr = patchStr[:idx]
 	}
-	fmt.Sscanf(patchStr, "%d", &patch)
+	_, _ = fmt.Sscanf(patchStr, "%d", &patch)
 
 	switch bumpType {
 	case "major":

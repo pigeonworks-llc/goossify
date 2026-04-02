@@ -1,8 +1,8 @@
 // Package templates provides all template content for goossify project generation.
-package templates
+package generator
 
 // README.md template
-const ReadmeTemplate = `# {{.Name}}
+const readmeTemplate = `# {{.Name}}
 
 {{.Description}}
 
@@ -51,7 +51,7 @@ This project is licensed under the {{.License}} License - see the [LICENSE](LICE
 `
 
 // .gitignore template
-const GitignoreTemplate = `# Binaries for programs and plugins
+const gitignoreTemplate = `# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
@@ -112,7 +112,7 @@ config.json
 `
 
 // go.mod template
-const GoModTemplate = `module {{.ModulePath}}
+const goModTemplate = `module {{.ModulePath}}
 
 go 1.22
 
@@ -123,7 +123,7 @@ require (
 `
 
 // MIT License template
-const MITLicenseTemplate = `MIT License
+const mITLicenseTemplate = `MIT License
 
 Copyright (c) {{.Year}} {{.Author}}
 
@@ -147,8 +147,8 @@ SOFTWARE.
 `
 
 // Apache 2.0 License template
-const Apache2LicenseTemplate = `Apache License
-Version 2.0, January 2004
+const apache2LicenseTemplate = `Apache License
+version 2.0, January 2004
 http://www.apache.org/licenses/
 
 TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
@@ -162,7 +162,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
 Copyright {{.Year}} {{.Author}}
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the Apache License, version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -176,7 +176,7 @@ limitations under the License.
 `
 
 // BSD 3-Clause License template
-const BSD3LicenseTemplate = `BSD 3-Clause License
+const bSD3LicenseTemplate = `BSD 3-Clause License
 
 Copyright (c) {{.Year}}, {{.Author}}
 All rights reserved.
@@ -208,7 +208,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `
 
 // Makefile template
-const MakefileTemplate = `.PHONY: build test clean lint fmt vet coverage bench security ci release release-snapshot install tidy deps dev help
+const makefileTemplate = `.PHONY: build test clean lint fmt vet coverage bench security ci release release-snapshot install tidy deps dev help
 
 # Build variables
 BINARY_NAME={{.Name}}
@@ -337,12 +337,12 @@ help:
 `
 
 // CHANGELOG.md template
-const ChangelogTemplate = `# Changelog
+const changelogTemplate = `# Changelog
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
@@ -371,7 +371,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 `
 
 // Default main.go template
-const DefaultMainTemplate = `package main
+const defaultMainTemplate = `package main
 
 import (
 	"fmt"
@@ -384,7 +384,7 @@ func main() {
 `
 
 // CLI main entry template
-const CLIMainEntryTemplate = `package main
+const cliMainEntryTemplate = `package main
 
 import (
 	"fmt"
@@ -402,7 +402,7 @@ func main() {
 `
 
 // CLI main template
-const CLIMainTemplate = `package main
+const cliMainTemplate = `package main
 
 import (
 	"{{.ModulePath}}/internal/cmd"
@@ -414,7 +414,7 @@ func main() {
 `
 
 // CLI root command template
-const CLIRootTemplate = `package cmd
+const cliRootTemplate = `package cmd
 
 import (
 	"fmt"
@@ -471,7 +471,7 @@ func initConfig() {
 `
 
 // CLI version command template
-const CLIVersionTemplate = `package cmd
+const cliVersionTemplate = `package cmd
 
 import (
 	"fmt"
@@ -487,7 +487,7 @@ var versionCmd = &cobra.Command{
 	Short: "Show version information",
 	Long:  "Display the current version of {{.Name}}",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("{{.Name}} version %s\n", version.Version)
+		fmt.Printf("{{.Name}} version %s\n", version.version)
 	},
 }
 
@@ -496,15 +496,15 @@ func init() {
 }
 `
 
-// Version template
-const VersionTemplate = `package version
+// version template
+const versionTemplate = `package version
 
-// Version represents the current version of {{.Name}}
-const Version = "0.1.0"
+// version represents the current version of {{.Name}}
+const version = "0.1.0"
 `
 
 // Library main template
-const LibraryMainTemplate = `package {{.PackageName}}
+const libraryMainTemplate = `package {{.PackageName}}
 
 // {{.StructName}} represents the main functionality
 type {{.StructName}} struct {
@@ -523,7 +523,7 @@ func (c *{{.StructName}}) DoSomething() string {
 `
 
 // Library test template
-const LibraryTestTemplate = `package {{.PackageName}}
+const libraryTestTemplate = `package {{.PackageName}}
 
 import (
 	"testing"
@@ -555,7 +555,7 @@ func BenchmarkDoSomething(b *testing.B) {
 `
 
 // Library example template
-const LibraryExampleTemplate = `package main
+const libraryExampleTemplate = `package main
 
 import (
 	"fmt"
@@ -571,7 +571,7 @@ func main() {
 `
 
 // Library doc template
-const LibraryDocTemplate = `// Package {{.PackageName}} {{.Description}}
+const libraryDocTemplate = `// Package {{.PackageName}} {{.Description}}
 //
 // This package provides the core functionality for {{.StructName}}.
 //
@@ -585,7 +585,7 @@ package {{.PackageName}}
 `
 
 // Web API main template
-const WebAPIMainTemplate = `package main
+const webAPIMainTemplate = `package main
 
 import (
 	"context"
@@ -629,7 +629,7 @@ func main() {
 `
 
 // Web API handler template
-const WebAPIHandlerTemplate = `package handler
+const webAPIHandlerTemplate = `package handler
 
 import (
 	"encoding/json"
@@ -672,7 +672,7 @@ func (h *Handler) Hello(w http.ResponseWriter, r *http.Request) {
 `
 
 // Web API CORS template
-const WebAPICORSTemplate = `package middleware
+const webAPICORSTemplate = `package middleware
 
 import (
 	"net/http"
@@ -696,7 +696,7 @@ func CORS(next http.Handler) http.Handler {
 `
 
 // Web API model template
-const WebAPIModelTemplate = `package model
+const webAPIModelTemplate = `package model
 
 // Response represents a standard API response
 type Response struct {
@@ -714,7 +714,7 @@ type ErrorResponse struct {
 `
 
 // Web API server template
-const WebAPIServerTemplate = `package server
+const webAPIServerTemplate = `package server
 
 import (
 	"net/http"
@@ -744,7 +744,7 @@ func New() *http.Server {
 `
 
 // OpenAPI template
-const OpenAPITemplate = `openapi: 3.0.3
+const openAPITemplate = `openapi: 3.0.3
 info:
   title: {{.Name}} API
   description: {{.Description}}
@@ -800,7 +800,7 @@ paths:
 `
 
 // Service templates will be added in the next part...
-const ServiceMainTemplate = `package service
+const serviceMainTemplate = `package service
 
 import (
 	"context"
@@ -836,7 +836,7 @@ func (s *Service) Stop(ctx context.Context) error {
 }
 `
 
-const ServiceRepositoryTemplate = `package repository
+const serviceRepositoryTemplate = `package repository
 
 import (
 	"context"
@@ -872,7 +872,7 @@ func (r *repository) Save(ctx context.Context, data interface{}) error {
 }
 `
 
-const ServiceConfigTemplate = `package config
+const serviceConfigTemplate = `package config
 
 import (
 	"fmt"
@@ -924,7 +924,7 @@ func Load() (*Config, error) {
 }
 `
 
-const ServiceMainEntryTemplate = `package main
+const serviceMainEntryTemplate = `package main
 
 import (
 	"context"
@@ -966,7 +966,7 @@ func main() {
 }
 `
 
-const DockerfileTemplate = `FROM golang:1.21-alpine AS builder
+const dockerfileTemplate = `FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
@@ -998,7 +998,7 @@ EXPOSE 8080
 CMD ["./{{.Name}}"]
 `
 
-const KubernetesTemplate = `apiVersion: apps/v1
+const kubernetesTemplate = `apiversion: apps/v1
 kind: Deployment
 metadata:
   name: {{.Name}}
@@ -1035,7 +1035,7 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
 ---
-apiVersion: v1
+apiversion: v1
 kind: Service
 metadata:
   name: {{.Name}}-service
@@ -1050,7 +1050,7 @@ spec:
 `
 
 // GitHub Actions CI template
-const GitHubCITemplate = `name: CI
+const gitHubCITemplate = `name: CI
 
 on:
   push:
@@ -1170,7 +1170,7 @@ jobs:
 `
 
 // GitHub Actions Release template
-const GitHubReleaseTemplate = `name: Release
+const gitHubReleaseTemplate = `name: Release
 
 on:
   push:
@@ -1237,7 +1237,7 @@ jobs:
 `
 
 // Auto Labeler workflow template
-const AutoLabelerTemplate = `name: Auto Label
+const autoLabelerTemplate = `name: Auto Label
 
 on:
   pull_request:
@@ -1258,7 +1258,7 @@ jobs:
 `
 
 // Labeler configuration template
-const LabelerConfigTemplate = `# Labeler configuration for {{.Name}}
+const labelerConfigTemplate = `# Labeler configuration for {{.Name}}
 
 # Component labels based on file changes
 "component/core":
@@ -1313,7 +1313,7 @@ const LabelerConfigTemplate = `# Labeler configuration for {{.Name}}
 `
 
 // Dependabot configuration template
-const DependabotTemplate = `# Dependabot configuration for {{.Name}}
+const dependabotTemplate = `# Dependabot configuration for {{.Name}}
 
 version: 2
 updates:
@@ -1367,7 +1367,7 @@ updates:
 `
 
 // CodeQL workflow template
-const CodeQLTemplate = `name: CodeQL Security Scan
+const codeQLTemplate = `name: CodeQL Security Scan
 
 on:
   push:
@@ -1418,7 +1418,7 @@ jobs:
 `
 
 // CODEOWNERS template
-const CodeOwnersTemplate = `# Code owners for {{.Name}}
+const codeOwnersTemplate = `# Code owners for {{.Name}}
 
 # Global owners
 * @{{.GitHubUsername}}
@@ -1452,7 +1452,7 @@ const CodeOwnersTemplate = `# Code owners for {{.Name}}
 `
 
 // Funding configuration template
-const FundingTemplate = `# Funding configuration for {{.Name}}
+const fundingTemplate = `# Funding configuration for {{.Name}}
 
 # GitHub Sponsors
 github: [{{.GitHubUsername}}]
@@ -1486,7 +1486,7 @@ github: [{{.GitHubUsername}}]
 `
 
 // Project management workflow template
-const ProjectManagementTemplate = `name: Project Management
+const projectManagementTemplate = `name: Project Management
 
 on:
   issues:
@@ -1557,7 +1557,7 @@ jobs:
 `
 
 // Auto-assign configuration template
-const AutoAssignTemplate = `# Auto-assign configuration for {{.Name}}
+const autoAssignTemplate = `# Auto-assign configuration for {{.Name}}
 
 # Set to true to add reviewers to pull requests
 addReviewers: true
@@ -1588,7 +1588,7 @@ skipKeywords:
 `
 
 // Issue forms configuration template
-const IssueFormsConfigTemplate = `# Issue forms configuration for {{.Name}}
+const issueFormsConfigTemplate = `# Issue forms configuration for {{.Name}}
 
 blank_issues_enabled: true
 
@@ -1611,7 +1611,7 @@ contact_links:
 `
 
 // Bug report template
-const BugReportTemplate = `---
+const bugReportTemplate = `---
 name: 🐛 Bug Report
 about: バグを報告する
 title: '[BUG] '
@@ -1639,8 +1639,8 @@ assignees: ''
 ## 🌍 Environment
 **Desktop (please complete the following information):**
  - OS: [e.g. macOS, Linux, Windows]
- - Version: [e.g. {{.Name}} v1.0.0]
- - Go Version: [e.g. 1.21.0]
+ - version: [e.g. {{.Name}} v1.0.0]
+ - Go version: [e.g. 1.21.0]
 
 ## 📄 Additional Context
 その他の関連情報があればお書きください。
@@ -1652,7 +1652,7 @@ assignees: ''
 `
 
 // Feature request template
-const FeatureRequestTemplate = `---
+const featureRequestTemplate = `---
 name: ✨ Feature Request
 about: 新機能を提案する
 title: '[FEATURE] '
@@ -1687,7 +1687,7 @@ assignees: ''
 `
 
 // Pull request template
-const PRTemplate = `<!--
+const pRTemplate = `<!--
 Thank you for contributing to {{.Name}}!
 Please take a moment to fill out this template to help us review your changes efficiently.
 -->
@@ -1863,7 +1863,7 @@ Your contribution helps make this project better for everyone.
 `
 
 // Contributing guide template
-const ContributingTemplate = `# Contributing to {{.Name}}
+const contributingTemplate = `# Contributing to {{.Name}}
 
 {{.Name}}への貢献をお考えいただき、ありがとうございます！🎉
 
@@ -2020,7 +2020,7 @@ make build
 `
 
 // Code of conduct template
-const CodeOfConductTemplate = `# Contributor Covenant Code of Conduct
+const codeOfConductTemplate = `# Contributor Covenant Code of Conduct
 
 ## Our Pledge
 
@@ -2100,21 +2100,21 @@ const CodeOfConductTemplate = `# Contributor Covenant Code of Conduct
 `
 
 // Security policy template
-const SecurityTemplate = `# Security Policy for {{.Name}}
+const securityTemplate = `# Security Policy for {{.Name}}
 
 We take the security of {{.Name}} seriously. This document outlines our security practices and how to report vulnerabilities.
 
-## 📋 Supported Versions
+## 📋 Supported versions
 
 Security updates are provided for the following versions of {{.Name}}:
 
-| Version | Supported          | End of Life        |
+| version | Supported          | End of Life        |
 | ------- | ------------------ | ------------------ |
 | 2.x.x   | :white_check_mark: | TBD                |
 | 1.x.x   | :white_check_mark: | 2025-12-31         |
 | < 1.0   | :x:                | 2024-12-31         |
 
-### Version Support Policy
+### version Support Policy
 
 - **Major versions**: Supported for at least 18 months after release
 - **Minor versions**: Latest minor version receives security updates
@@ -2150,7 +2150,7 @@ Please provide as much information as possible:
 
 #### Helpful Additional Information
 - **Proof of Concept**: Steps to reproduce or PoC code
-- **Affected Versions**: Which versions are affected?
+- **Affected versions**: Which versions are affected?
 - **Environment**: OS, Go version, deployment details
 - **Mitigation**: Any temporary workarounds you've identified
 - **CVSS Score**: If you've calculated one
@@ -2160,7 +2160,7 @@ Please provide as much information as possible:
 ` + "```" + `
 **Vulnerability Type**: [e.g., SQL Injection, XSS, Command Injection]
 **Affected Component**: [e.g., cmd/server, internal/auth]
-**Affected Versions**: [e.g., v1.0.0 - v1.2.3]
+**Affected versions**: [e.g., v1.0.0 - v1.2.3]
 **Severity**: [e.g., High, Critical]
 
 **Description**:
@@ -2295,7 +2295,7 @@ The following are generally considered out of scope:
 ---
 
 **Last Updated**: 2024-01-01
-**Policy Version**: 1.0
+**Policy version**: 1.0
 
 Thank you for helping keep {{.Name}} and the community safe! 🙏
 
@@ -2303,7 +2303,7 @@ Thank you for helping keep {{.Name}} and the community safe! 🙏
 `
 
 // Support template
-const SupportTemplate = `# Support
+const supportTemplate = `# Support
 
 {{.Name}}をお使いいただき、ありがとうございます！質問やサポートが必要な場合は、以下のリソースをご利用ください。
 
@@ -2429,7 +2429,7 @@ Issueを作成する際の参考として：
 `
 
 // GitHub Repository Settings template
-const GitHubSettingsTemplate = `# GitHub Repository Settings for {{.Name}}
+const gitHubSettingsTemplate = `# GitHub Repository Settings for {{.Name}}
 
 This document outlines the recommended settings for your {{.Name}} repository.
 
@@ -2553,7 +2553,7 @@ This setup ensures your {{.Name}} project follows OSS best practices and provide
 `
 
 // Labels configuration template
-const GitHubLabelsTemplate = `# GitHub Labels Configuration for {{.Name}}
+const gitHubLabelsTemplate = `# GitHub Labels Configuration for {{.Name}}
 
 # This file defines labels for better issue and PR management.
 # Apply with: gh label list --repo {{.GitHubUsername}}/{{.Name}}
@@ -2724,7 +2724,7 @@ const GitHubLabelsTemplate = `# GitHub Labels Configuration for {{.Name}}
 `
 
 // Question template
-const QuestionTemplate = `---
+const questionTemplate = `---
 name: ❓ Question
 about: 使い方やプロジェクトについて質問する
 title: '[QUESTION] '
@@ -2749,8 +2749,8 @@ assignees: ''
 
 **実行環境:**
 - OS: [e.g. macOS 12.0, Ubuntu 20.04, Windows 11]
-- Go Version: [e.g. 1.21.0]
-- {{.Name}} Version: [e.g. v1.0.0]
+- Go version: [e.g. 1.21.0]
+- {{.Name}} version: [e.g. v1.0.0]
 
 ## 📄 Additional Context
 
@@ -2762,3 +2762,4 @@ assignees: ''
 - より迅速な回答を得るため、[Discussions](../../discussions) の利用もご検討ください
 - コードに関する質問の場合は、最小限の再現可能な例を提供してください
 `
+

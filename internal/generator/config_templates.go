@@ -1,7 +1,7 @@
-package templates
+package generator
 
 // .golangci.yml template
-const GolangCITemplate = `# golangci-lint configuration for {{.Name}}
+const golangCITemplate = `# golangci-lint configuration for {{.Name}}
 
 run:
   timeout: 5m
@@ -135,7 +135,7 @@ severity:
 `
 
 // .goreleaser.yml template
-const GoReleaserTemplate = `# GoReleaser configuration for {{.Name}}
+const goReleaserTemplate = `# GoReleaser configuration for {{.Name}}
 
 project_name: {{.Name}}
 
@@ -191,7 +191,7 @@ release:
 `
 
 // .goossify.yml template
-const GoossifyConfigTemplate = `# goossify configuration for {{.Name}}
+const goossifyConfigTemplate = `# goossify configuration for {{.Name}}
 
 project:
   name: "{{.Name}}"

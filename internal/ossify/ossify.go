@@ -119,8 +119,8 @@ func (o *Ossifier) ensureGitHubFiles() error {
 	workflowsDir := filepath.Join(githubDir, "workflows")
 
 	// .github/workflows ディレクトリ作成
-	if err := os.MkdirAll(workflowsDir, 0755); err != nil {
-		return fmt.Errorf("GitHub ディレクトリ作成失敗: %w", err)
+	if err := os.MkdirAll(workflowsDir, 0o750); err != nil {
+		return fmt.Errorf("gitHub ディレクトリ作成失敗: %w", err)
 	}
 
 	// CI workflow生成
@@ -175,7 +175,7 @@ jobs:
         version: latest`
 
 		if err := os.WriteFile(ciPath, []byte(ciContent), 0600); err != nil {
-			return fmt.Errorf("CI設定ファイル作成失敗: %w", err)
+			return fmt.Errorf("ci設定ファイル作成失敗: %w", err)
 		}
 	}
 
@@ -217,7 +217,7 @@ jobs:
         GITHUB_OWNER: ${{ github.repository_owner }}`
 
 		if err := os.WriteFile(releasePath, []byte(releaseContent), 0600); err != nil {
-			return fmt.Errorf("Release workflow作成失敗: %w", err)
+			return fmt.Errorf("release workflow作成失敗: %w", err)
 		}
 	}
 
@@ -367,8 +367,8 @@ func (o *Ossifier) ensureIssueTemplates() error {
 	issueTemplateDir := filepath.Join(o.projectPath, ".github", "ISSUE_TEMPLATE")
 
 	// ISSUE_TEMPLATE ディレクトリ作成
-	if err := os.MkdirAll(issueTemplateDir, 0755); err != nil {
-		return fmt.Errorf("Issue template ディレクトリ作成失敗: %w", err)
+	if err := os.MkdirAll(issueTemplateDir, 0o750); err != nil {
+		return fmt.Errorf("issue template ディレクトリ作成失敗: %w", err)
 	}
 
 	// Bug report template
@@ -408,7 +408,7 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.`
 
 		if err := os.WriteFile(bugReportPath, []byte(bugReportContent), 0600); err != nil {
-			return fmt.Errorf("Bug report テンプレート作成失敗: %w", err)
+			return fmt.Errorf("bug report テンプレート作成失敗: %w", err)
 		}
 	}
 
@@ -437,7 +437,7 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.`
 
 		if err := os.WriteFile(featureReqPath, []byte(featureReqContent), 0600); err != nil {
-			return fmt.Errorf("Feature request テンプレート作成失敗: %w", err)
+			return fmt.Errorf("feature request テンプレート作成失敗: %w", err)
 		}
 	}
 
@@ -491,7 +491,7 @@ func (o *Ossifier) ensureDirectories() error {
 	docsDir := filepath.Join(o.projectPath, "docs")
 	if _, err := os.Stat(docsDir); err != nil {
 		fmt.Println("📚 docs ディレクトリを生成中...")
-		if err := os.MkdirAll(docsDir, 0755); err != nil {
+		if err := os.MkdirAll(docsDir, 0o750); err != nil {
 			return fmt.Errorf("docs ディレクトリ作成失敗: %w", err)
 		}
 
@@ -635,7 +635,7 @@ changelog:
       order: 999`
 
 		if err := os.WriteFile(goreleaserPath, []byte(goreleaserContent), 0600); err != nil {
-			return fmt.Errorf("GoReleaser設定ファイル作成失敗: %w", err)
+			return fmt.Errorf("goReleaser設定ファイル作成失敗: %w", err)
 		}
 	}
 

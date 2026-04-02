@@ -145,7 +145,7 @@ func runReady(cmd *cobra.Command, args []string) error {
 	if !isJSON {
 		fmt.Println("\n🔍 Sensitive Information Check...")
 	}
-	sensitiveFiles, sensitiveErr := checkSensitiveFilesResult(targetPath)
+	sensitiveFiles := checkSensitiveFilesResult(targetPath)
 	if len(sensitiveFiles) > 0 {
 		readyResult.Ready = false
 		readyResult.SensitiveFiles = sensitiveFiles
@@ -157,8 +157,6 @@ func runReady(cmd *cobra.Command, args []string) error {
 				fmt.Printf("    ⚠️  %s\n", f)
 			}
 		}
-	} else if sensitiveErr != nil {
-		readyResult.Warnings = append(readyResult.Warnings, sensitiveErr.Error())
 	} else if !isJSON {
 		fmt.Println("✅ No sensitive information detected")
 	}
@@ -244,7 +242,7 @@ func outputReadyJSON(result *ReadyResult) error {
 }
 
 // checkSensitiveFilesResult checks for sensitive files and returns the list.
-func checkSensitiveFilesResult(projectPath string) ([]string, error) {
+func checkSensitiveFilesResult(projectPath string) []string {
 	sensitivePatterns := []struct {
 		pattern     string
 		description string
@@ -308,13 +306,11 @@ func checkSensitiveFilesResult(projectPath string) ([]string, error) {
 		})
 	}
 
-	return foundFiles, nil
+	return foundFiles
 }
 
 // checkLicenseConsistencyResult checks license and returns structured result.
-func checkLicenseConsistencyResult(projectPath string) (*LicenseInfo, []string) {
-	var warnings []string
-
+func checkLicenseConsistencyResult(projectPath string) (info *LicenseInfo, warnings []string) {
 	licensePath := filepath.Join(projectPath, "LICENSE")
 	licenseContent, err := os.ReadFile(licensePath)
 	if os.IsNotExist(err) {
@@ -325,7 +321,7 @@ func checkLicenseConsistencyResult(projectPath string) (*LicenseInfo, []string) 
 	}
 
 	detectedLicense := detectLicenseType(string(licenseContent))
-	info := &LicenseInfo{
+	info = &LicenseInfo{
 		Type:       detectedLicense,
 		Consistent: true,
 	}
