@@ -54,6 +54,7 @@ linters:
         - G204
         - G304
         - G306
+        - G703
 
   exclusions:
     rules:

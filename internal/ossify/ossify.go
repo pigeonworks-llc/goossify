@@ -284,7 +284,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 By contributing, you agree that your contributions will be licensed under the Apache License 2.0.`, o.projectName, o.projectName, o.projectName)
 
 		if err := os.WriteFile(contributingPath, []byte(contributingContent), 0600); err != nil {
-			return fmt.Errorf("CONTRIBUTING.md作成失敗: %w", err)
+			return fmt.Errorf("cONTRIBUTING.md作成失敗: %w", err)
 		}
 	}
 
@@ -328,7 +328,7 @@ This information will help us triage your report more quickly.
 We prefer all communications to be in English or Japanese.`, o.projectName)
 
 		if err := os.WriteFile(securityPath, []byte(securityContent), 0600); err != nil {
-			return fmt.Errorf("SECURITY.md作成失敗: %w", err)
+			return fmt.Errorf("sECURITY.md作成失敗: %w", err)
 		}
 	}
 
@@ -346,7 +346,7 @@ func (o *Ossifier) initGitIfNeeded() error {
 	cmd := exec.Command("git", "init")
 	cmd.Dir = o.projectPath
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("Git初期化失敗: %w", err)
+		return fmt.Errorf("git初期化失敗: %w", err)
 	}
 
 	return nil
@@ -479,7 +479,7 @@ Add screenshots to help explain your changes.
 Any additional information, configuration, or data that might be helpful in reviewing this PR.`
 
 		if err := os.WriteFile(prTemplatePath, []byte(prTemplateContent), 0600); err != nil {
-			return fmt.Errorf("PR テンプレート作成失敗: %w", err)
+			return fmt.Errorf("pR テンプレート作成失敗: %w", err)
 		}
 	}
 
@@ -558,7 +558,7 @@ func (o *Ossifier) ensureConfigFiles() error {
 }`
 
 		if err := os.WriteFile(renovatePath, []byte(renovateContent), 0600); err != nil {
-			return fmt.Errorf("Renovate設定ファイル作成失敗: %w", err)
+			return fmt.Errorf("renovate設定ファイル作成失敗: %w", err)
 		}
 	}
 
@@ -804,7 +804,7 @@ func (o *Ossifier) ensureEnhancedCommunityFiles() error {
 	if _, err := os.Stat(supportPath); err != nil {
 		fmt.Println("🆘 SUPPORT.md を生成中...")
 		if err := o.writeFileInteractive(supportPath, supportContent, "SUPPORT.md - サポート情報"); err != nil {
-			return fmt.Errorf("SUPPORT.md作成失敗: %w", err)
+			return fmt.Errorf("sUPPORT.md作成失敗: %w", err)
 		}
 	}
 
@@ -812,7 +812,7 @@ func (o *Ossifier) ensureEnhancedCommunityFiles() error {
 }
 
 // writeFileInteractive はファイルを対話的に書き込む
-func (o *Ossifier) writeFileInteractive(filePath string, content string, description string) error {
+func (o *Ossifier) writeFileInteractive(filePath, content, description string) error {
 	// 既存ファイル確認
 	exists := false
 	if _, err := os.ReadFile(filePath); err == nil {

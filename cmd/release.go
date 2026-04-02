@@ -126,7 +126,7 @@ func adjustBump(version, bumpType string) string {
 	// Parse version
 	var major, minor, patch int
 	version = version[1:] // Remove 'v' prefix
-	fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
+	_, _ = fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
 
 	switch bumpType {
 	case "minor":
