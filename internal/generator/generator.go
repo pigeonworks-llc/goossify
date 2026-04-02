@@ -12,8 +12,6 @@ import (
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-
-	"github.com/pigeonworks-llc/goossify/internal/template/templates"
 )
 
 // ProjectConfig represents the configuration for project generation.
@@ -32,7 +30,7 @@ type ProjectConfig struct {
 	StructName     string
 }
 
-// Generator generates Go OSS projects from templates.
+// Generator generates Go OSS projects from
 type Generator struct {
 	basePath string
 	config   *ProjectConfig
@@ -125,13 +123,13 @@ func (g *Generator) createDirectoryStructure() error {
 
 func (g *Generator) generateBaseFiles() error {
 	baseFiles := map[string]string{
-		"README.md":    templates.ReadmeTemplate,
+		"README.md":    readmeTemplate,
 		"LICENSE":      g.getLicenseTemplate(),
-		".gitignore":   templates.GitignoreTemplate,
-		"go.mod":       templates.GoModTemplate,
+		".gitignore":   gitignoreTemplate,
+		"go.mod":       goModTemplate,
 		"main.go":      g.getMainTemplate(),
-		"Makefile":     templates.MakefileTemplate,
-		"CHANGELOG.md": templates.ChangelogTemplate,
+		"Makefile":     makefileTemplate,
+		"CHANGELOG.md": changelogTemplate,
 	}
 
 	for filename, templateContent := range baseFiles {
@@ -160,10 +158,10 @@ func (g *Generator) generateTypeSpecificFiles() error {
 
 func (g *Generator) generateCLIFiles() error {
 	cliFiles := map[string]string{
-		filepath.Join("cmd", g.config.Name, "main.go"):     templates.CLIMainTemplate,
-		filepath.Join("internal", "cmd", "root.go"):        templates.CLIRootTemplate,
-		filepath.Join("internal", "cmd", "version.go"):     templates.CLIVersionTemplate,
-		filepath.Join("internal", "version", "version.go"): templates.VersionTemplate,
+		filepath.Join("cmd", g.config.Name, "main.go"):     cliMainTemplate,
+		filepath.Join("internal", "cmd", "root.go"):        cliRootTemplate,
+		filepath.Join("internal", "cmd", "version.go"):     cliVersionTemplate,
+		filepath.Join("internal", "version", "version.go"): versionTemplate,
 	}
 
 	for filename, templateContent := range cliFiles {
@@ -180,10 +178,10 @@ func (g *Generator) generateCLIFiles() error {
 
 func (g *Generator) generateLibraryFiles() error {
 	libraryFiles := map[string]string{
-		filepath.Join("pkg", g.config.PackageName, g.config.PackageName+".go"):      templates.LibraryMainTemplate,
-		filepath.Join("pkg", g.config.PackageName, g.config.PackageName+"_test.go"): templates.LibraryTestTemplate,
-		filepath.Join("examples", "basic", "main.go"):                               templates.LibraryExampleTemplate,
-		"doc.go": templates.LibraryDocTemplate,
+		filepath.Join("pkg", g.config.PackageName, g.config.PackageName+".go"):      libraryMainTemplate,
+		filepath.Join("pkg", g.config.PackageName, g.config.PackageName+"_test.go"): libraryTestTemplate,
+		filepath.Join("examples", "basic", "main.go"):                               libraryExampleTemplate,
+		"doc.go": libraryDocTemplate,
 	}
 
 	for filename, templateContent := range libraryFiles {
@@ -200,11 +198,11 @@ func (g *Generator) generateLibraryFiles() error {
 
 func (g *Generator) generateWebAPIFiles() error {
 	webAPIFiles := map[string]string{
-		filepath.Join("internal", "handler", "handler.go"): templates.WebAPIHandlerTemplate,
-		filepath.Join("internal", "middleware", "cors.go"): templates.WebAPICORSTemplate,
-		filepath.Join("internal", "model", "response.go"):  templates.WebAPIModelTemplate,
-		filepath.Join("internal", "server", "server.go"):   templates.WebAPIServerTemplate,
-		"api/openapi.yaml": templates.OpenAPITemplate,
+		filepath.Join("internal", "handler", "handler.go"): webAPIHandlerTemplate,
+		filepath.Join("internal", "middleware", "cors.go"): webAPICORSTemplate,
+		filepath.Join("internal", "model", "response.go"):  webAPIModelTemplate,
+		filepath.Join("internal", "server", "server.go"):   webAPIServerTemplate,
+		"api/openapi.yaml": openAPITemplate,
 	}
 
 	for filename, templateContent := range webAPIFiles {
@@ -221,11 +219,11 @@ func (g *Generator) generateWebAPIFiles() error {
 
 func (g *Generator) generateServiceFiles() error {
 	serviceFiles := map[string]string{
-		filepath.Join("internal", "service", "service.go"):            templates.ServiceMainTemplate,
-		filepath.Join("internal", "repository", "repository.go"):      templates.ServiceRepositoryTemplate,
-		filepath.Join("internal", "config", "config.go"):              templates.ServiceConfigTemplate,
-		filepath.Join("deployments", "docker", "Dockerfile"):          templates.DockerfileTemplate,
-		filepath.Join("deployments", "kubernetes", "deployment.yaml"): templates.KubernetesTemplate,
+		filepath.Join("internal", "service", "service.go"):            serviceMainTemplate,
+		filepath.Join("internal", "repository", "repository.go"):      serviceRepositoryTemplate,
+		filepath.Join("internal", "config", "config.go"):              serviceConfigTemplate,
+		filepath.Join("deployments", "docker", "Dockerfile"):          dockerfileTemplate,
+		filepath.Join("deployments", "kubernetes", "deployment.yaml"): kubernetesTemplate,
 	}
 
 	for filename, templateContent := range serviceFiles {
@@ -242,9 +240,9 @@ func (g *Generator) generateServiceFiles() error {
 
 func (g *Generator) generateConfigFiles() error {
 	configFiles := map[string]string{
-		".golangci.yml":   templates.GolangCITemplate,
-		".goreleaser.yml": templates.GoReleaserTemplate,
-		".goossify.yml":   templates.GoossifyConfigTemplate,
+		".golangci.yml":   golangCITemplate,
+		".goreleaser.yml": goReleaserTemplate,
+		".goossify.yml":   goossifyConfigTemplate,
 	}
 
 	for filename, templateContent := range configFiles {
@@ -259,33 +257,33 @@ func (g *Generator) generateConfigFiles() error {
 func (g *Generator) generateGitHubFiles() error {
 	githubFiles := map[string]string{
 		// Workflows
-		".github/workflows/ci.yml":                 templates.GitHubCITemplate,
-		".github/workflows/release.yml":            templates.GitHubReleaseTemplate,
-		".github/workflows/auto-label.yml":         templates.AutoLabelerTemplate,
-		".github/workflows/codeql.yml":             templates.CodeQLTemplate,
-		".github/workflows/project-management.yml": templates.ProjectManagementTemplate,
+		".github/workflows/ci.yml":                 gitHubCITemplate,
+		".github/workflows/release.yml":            gitHubReleaseTemplate,
+		".github/workflows/auto-label.yml":         autoLabelerTemplate,
+		".github/workflows/codeql.yml":             codeQLTemplate,
+		".github/workflows/project-management.yml": projectManagementTemplate,
 
 		// Issue and PR templates
-		".github/ISSUE_TEMPLATE/bug_report.md":      templates.BugReportTemplate,
-		".github/ISSUE_TEMPLATE/feature_request.md": templates.FeatureRequestTemplate,
-		".github/ISSUE_TEMPLATE/question.md":        templates.QuestionTemplate,
-		".github/ISSUE_TEMPLATE/config.yml":         templates.IssueFormsConfigTemplate,
-		".github/PULL_REQUEST_TEMPLATE.md":          templates.PRTemplate,
+		".github/ISSUE_TEMPLATE/bug_report.md":      bugReportTemplate,
+		".github/ISSUE_TEMPLATE/feature_request.md": featureRequestTemplate,
+		".github/ISSUE_TEMPLATE/question.md":        questionTemplate,
+		".github/ISSUE_TEMPLATE/config.yml":         issueFormsConfigTemplate,
+		".github/PULL_REQUEST_TEMPLATE.md":          pRTemplate,
 
 		// Community files
-		".github/CONTRIBUTING.md":    templates.ContributingTemplate,
-		".github/CODE_OF_CONDUCT.md": templates.CodeOfConductTemplate,
-		".github/SECURITY.md":        templates.SecurityTemplate,
-		".github/SUPPORT.md":         templates.SupportTemplate,
-		".github/FUNDING.yml":        templates.FundingTemplate,
+		".github/CONTRIBUTING.md":    contributingTemplate,
+		".github/CODE_OF_CONDUCT.md": codeOfConductTemplate,
+		".github/SECURITY.md":        securityTemplate,
+		".github/SUPPORT.md":         supportTemplate,
+		".github/FUNDING.yml":        fundingTemplate,
 
 		// Configuration files
-		".github/dependabot.yml":      templates.DependabotTemplate,
-		".github/labeler.yml":         templates.LabelerConfigTemplate,
-		".github/labels.yml":          templates.GitHubLabelsTemplate,
-		".github/auto-assign.yml":     templates.AutoAssignTemplate,
-		".github/CODEOWNERS":          templates.CodeOwnersTemplate,
-		".github/REPOSITORY_SETUP.md": templates.GitHubSettingsTemplate,
+		".github/dependabot.yml":      dependabotTemplate,
+		".github/labeler.yml":         labelerConfigTemplate,
+		".github/labels.yml":          gitHubLabelsTemplate,
+		".github/auto-assign.yml":     autoAssignTemplate,
+		".github/CODEOWNERS":          codeOwnersTemplate,
+		".github/REPOSITORY_SETUP.md": gitHubSettingsTemplate,
 	}
 
 	for filename, templateContent := range githubFiles {
@@ -320,7 +318,7 @@ func (g *Generator) writeFileFromTemplate(filename, templateContent string) erro
 	if err != nil {
 		return fmt.Errorf("ファイル作成失敗: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	if err := tmpl.Execute(file, g.config); err != nil {
 		return fmt.Errorf("テンプレート実行失敗: %w", err)
@@ -332,28 +330,28 @@ func (g *Generator) writeFileFromTemplate(filename, templateContent string) erro
 func (g *Generator) getLicenseTemplate() string {
 	switch g.config.License {
 	case "MIT":
-		return templates.MITLicenseTemplate
+		return mITLicenseTemplate
 	case "Apache-2.0":
-		return templates.Apache2LicenseTemplate
+		return apache2LicenseTemplate
 	case "BSD-3-Clause":
-		return templates.BSD3LicenseTemplate
+		return bSD3LicenseTemplate
 	default:
-		return templates.Apache2LicenseTemplate
+		return apache2LicenseTemplate
 	}
 }
 
 func (g *Generator) getMainTemplate() string {
 	switch g.config.Type {
 	case "cli-tool":
-		return templates.CLIMainEntryTemplate
+		return cliMainEntryTemplate
 	case "web-api":
-		return templates.WebAPIMainTemplate
+		return webAPIMainTemplate
 	case "service":
-		return templates.ServiceMainEntryTemplate
+		return serviceMainEntryTemplate
 	case "library":
 		return "" // ライブラリにはmain.goは不要
 	default:
-		return templates.DefaultMainTemplate
+		return defaultMainTemplate
 	}
 }
 
@@ -411,7 +409,7 @@ func toExportedName(name string) string {
 	}
 
 	segments := strings.FieldsFunc(name, func(r rune) bool {
-		return !(unicode.IsLetter(r) || unicode.IsDigit(r))
+		return !unicode.IsLetter(r) && !unicode.IsDigit(r)
 	})
 
 	if len(segments) == 0 {
