@@ -317,7 +317,7 @@ func createProjectDirectory(projectName string) (string, error) {
 		return "", fmt.Errorf("ディレクトリ確認失敗: %w", err)
 	}
 
-	if err := os.MkdirAll(projectPath, 0o755); err != nil {
+	if err := os.MkdirAll(projectPath, 0o750); err != nil {
 		return "", fmt.Errorf("ディレクトリ作成失敗: %w", err)
 	}
 
